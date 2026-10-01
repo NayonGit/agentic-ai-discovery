@@ -11,7 +11,7 @@ from rich.text import Text
 
 MAX_LOG_ENTRIES = 200
 HEADER_HEIGHT = 3
-FOOTER_HEIGHT = 4
+FOOTER_HEIGHT = 5
 PANEL_FRAME_HEIGHT = 2  # top + bottom border of a Panel
 PANEL_FRAME_WIDTH = 4  # left/right border + 1 padding each side
 
@@ -22,7 +22,7 @@ class Dashboard:
     """Live terminal view of the hunt: where the agent is, what it's doing,
     and how much of your Claude subscription that's using up."""
 
-    def __init__(self, room_names: list[str]) -> None:
+    def __init__(self, room_names: list[str], max_turns: int, max_budget_usd: float) -> None:
         self.room_names = room_names
         self.current_room = room_names[0]
         self.visited = {room_names[0]}
@@ -31,6 +31,8 @@ class Dashboard:
         self.log_lines: list[str] = []
         self.tokens = {"input": 0, "output": 0, "cache_read": 0, "cache_creation": 0}
         self.turns = 0
+        self.max_turns = max_turns
+        self.max_budget_usd = max_budget_usd
         self.rate_limits: dict[str, dict] = {}
 
         self._console = Console()
@@ -147,13 +149,21 @@ class Dashboard:
 
     def _usage_panel(self) -> Panel:
         t = self.tokens
-        tokens_line = (
-            f"Turns: {self.turns}  In: {t['input']}  Out: {t['output']}  "
-            f"CacheR: {t['cache_read']}  CacheW: {t['cache_creation']}"
+        turns_style = "bold red" if self.turns >= self.max_turns else "bold"
+        turns_text = Text(no_wrap=True, overflow="ellipsis")
+        turns_text.append(f"Turns: {self.turns}/{self.max_turns}  ", style=turns_style)
+        turns_text.append(
+            f"In: {t['input']}  Out: {t['output']}  CacheR: {t['cache_read']}  CacheW: {t['cache_creation']}"
+        )
+
+        guardrails_line = (
+            f"Guardrails: stop at {self.max_turns} turns or ${self.max_budget_usd:.2f} budget "
+            "(notional cost, tracked by the SDK — not a separate charge on your subscription)"
         )
         windows_line = "   ".join(self._format_window(key, label) for key, label in RATE_LIMIT_WINDOWS)
 
         content = Table.grid()
-        content.add_row(Text(tokens_line, no_wrap=True, overflow="ellipsis"))
+        content.add_row(turns_text)
+        content.add_row(Text(guardrails_line, no_wrap=True, overflow="ellipsis", style="dim"))
         content.add_row(Text(windows_line, no_wrap=True, overflow="ellipsis", style="bold"))
         return Panel(content, title="Usage (subscription)", border_style="green")

@@ -8,15 +8,19 @@ ROOMS = {
         "description": "An overgrown courtyard. A dry fountain sits at its center.",
         "exits": {"south": "entrance", "north": "tower", "east": "garden"},
         "item": "a torn map fragment",
+        "item_description": (
+            "You found a torn map fragment. A faded note scrawled on it reads: "
+            "'X marks the spot — beneath the dry fountain.' You add the fragment to your inventory."
+        ),
     },
     "garden": {
         "description": "A tangled garden, roses gone wild. Something glints beneath a bush.",
-        "exits": {"west": "courtyard"},
+        "exits": {"west": "courtyard", "north": "tower"},
         "item": "a rusty key",
     },
     "tower": {
         "description": "A narrow stone tower. A ladder leads up into darkness.",
-        "exits": {"south": "courtyard", "up": "attic"},
+        "exits": {"south": "courtyard", "up": "attic", "west": "garden"},
         "item": None,
     },
     "attic": {
@@ -71,4 +75,4 @@ class World:
         if item == "the treasure chest":
             self.treasure_found = True
             return "You pry open a dusty chest and find THE TREASURE! You win!"
-        return f"You found {item} and added it to your inventory."
+        return room.get("item_description") or f"You found {item} and added it to your inventory."

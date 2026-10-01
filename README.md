@@ -26,8 +26,26 @@ rate limits rather than separate API credits. Requires the `claude` CLI logged i
 (`claude setup-token` if running non-interactively) — no `ANTHROPIC_API_KEY` needed.
 
 A live terminal dashboard (`rich`) shows the map, the agent's running commentary
-and tool calls, and token/cost usage as it happens.
+and tool calls, and subscription usage as it happens. The hunt pauses after
+every tool call so you can read each step — press Enter to advance.
 
 ```bash
 uv run treasure-hunt
 ```
+
+### Guardrails
+
+The loop is capped by `max_turns` (20) and `max_budget_usd` ($0.50, a notional
+cost figure the SDK tracks internally — not a real charge under subscription
+billing) so an agent that never converges can't run forever. Both are
+generous enough that a normal hunt always finishes comfortably — to see a
+guardrail actually trip:
+
+```bash
+MAX_TURNS=3 uv run treasure-hunt        # hits the turn cap almost immediately
+MAX_BUDGET_USD=0.01 uv run treasure-hunt  # hits the budget cap after turn 1
+```
+
+The map also has a loop (garden ↔ tower) and a decoy clue (the courtyard's
+map fragment falsely points to the fountain) so a normal run isn't always the
+same short, straight path.
