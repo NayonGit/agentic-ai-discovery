@@ -1,0 +1,767 @@
+<title>The Estate Expedition</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #dcd6c6;
+    --ground-raised: #e9e4d6;
+    --ground-sunken: #cfc8b6;
+    --ink: #201d18;
+    --ink-dim: #5f594b;
+    --ink-faint: #8c8572;
+    --line: rgba(32, 29, 24, 0.15);
+    --line-strong: rgba(32, 29, 24, 0.28);
+    --accent: #2f6358;
+    --accent-ink: #e9f3f0;
+    --gold: #93711f;
+    --rust: #8b4332;
+    --moss: #4e5c3a;
+
+    --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --font-body: 'Lora', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #15171a;
+      --ground-raised: #1d2023;
+      --ground-sunken: #0f1113;
+      --ink: #e8e3d4;
+      --ink-dim: #a9a393;
+      --ink-faint: #726c5d;
+      --line: rgba(232, 227, 212, 0.14);
+      --line-strong: rgba(232, 227, 212, 0.26);
+      --accent: #6cb3a2;
+      --accent-ink: #0d1716;
+      --gold: #d8b863;
+      --rust: #d1715e;
+      --moss: #93a67c;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #15171a;
+    --ground-raised: #1d2023;
+    --ground-sunken: #0f1113;
+    --ink: #e8e3d4;
+    --ink-dim: #a9a393;
+    --ink-faint: #726c5d;
+    --line: rgba(232, 227, 212, 0.14);
+    --line-strong: rgba(232, 227, 212, 0.26);
+    --accent: #6cb3a2;
+    --accent-ink: #0d1716;
+    --gold: #d8b863;
+    --rust: #d1715e;
+    --moss: #93a67c;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+
+  /* ---------- header ---------- */
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.6rem 0.9rem;
+    border-bottom: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+
+  header h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.7rem;
+    margin: 0;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+
+  header h1 em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .header-meta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    text-align: right;
+    line-height: 1.5;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .recording-picker {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .recording-picker label {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+
+  .recording-picker select {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    background: var(--ground-raised);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+  }
+
+  .recording-picker select:hover { border-color: var(--accent); }
+  .recording-picker select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* ---------- main layout ---------- */
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(280px, 38%) 1fr;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .map-pane {
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 1rem 1.2rem;
+  }
+
+  .map-pane h2, .journal-pane h2 {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    margin: 0 0 0.6rem;
+    font-weight: 500;
+  }
+
+  #map-svg {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+  }
+
+  .room-caption {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink-dim);
+    text-align: center;
+    min-height: 2.6em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.5rem;
+    text-wrap: balance;
+  }
+
+  .journal-pane {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 1rem 1.4rem 1rem 1.6rem;
+  }
+
+  #journal {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  #journal::-webkit-scrollbar { width: 8px; }
+  #journal::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 4px; }
+
+  .entry {
+    display: flex;
+    gap: 0.7rem;
+    opacity: 0;
+    transform: translateY(4px);
+    animation: entry-in 0.35s ease forwards;
+  }
+
+  @keyframes entry-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .entry.no-anim { animation: none; opacity: 1; transform: none; }
+
+  .entry-glyph {
+    flex-shrink: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    margin-top: 0.15rem;
+    border: 1px solid var(--line-strong);
+    background: var(--ground-raised);
+    color: var(--ink-dim);
+  }
+
+  .entry.reasoning .entry-glyph { border-color: transparent; background: transparent; color: var(--accent); font-size: 1rem; }
+  .entry.setback .entry-glyph { background: color-mix(in srgb, var(--rust) 16%, var(--ground-raised)); border-color: var(--rust); color: var(--rust); }
+  .entry.victory .entry-glyph { background: color-mix(in srgb, var(--gold) 20%, var(--ground-raised)); border-color: var(--gold); color: var(--gold); }
+
+  .entry-body { min-width: 0; }
+
+  .entry.reasoning .entry-body {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.08rem;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .entry-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    margin-bottom: 0.15rem;
+  }
+
+  .entry.setback .entry-label { color: var(--rust); }
+  .entry.victory .entry-label { color: var(--gold); }
+
+  .entry-text {
+    font-size: 0.93rem;
+    color: var(--ink-dim);
+    line-height: 1.5;
+  }
+
+  .entry.setback .entry-text { color: var(--ink); }
+  .entry.victory .entry-text { color: var(--ink); font-size: 1rem; }
+
+  .entry-empty {
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--ink-faint);
+    font-size: 1.1rem;
+    margin: auto;
+  }
+
+  /* ---------- footer: ledger + transport ---------- */
+
+  footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--line);
+    background: var(--ground-raised);
+    padding: 0.8rem 1.6rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .ledger {
+    display: flex;
+    gap: 1.6rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .ledger-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .ledger-label {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+
+  .ledger-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .gauge {
+    width: 86px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--ground-sunken);
+    overflow: hidden;
+    margin-top: 0.3rem;
+  }
+
+  .gauge-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .ledger-item.spacer { flex: 1; }
+
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .transport button {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 0.4rem 0.7rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .transport button:hover { border-color: var(--accent); color: var(--accent); }
+  .transport button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .transport button:disabled { opacity: 0.35; cursor: default; }
+  .transport button:disabled:hover { border-color: var(--line-strong); color: var(--ink); }
+
+  #play-toggle { min-width: 4.6rem; }
+
+  #scrubber {
+    flex: 1;
+    accent-color: var(--accent);
+  }
+
+  .step-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--ink-faint);
+    min-width: 5.2rem;
+    text-align: right;
+  }
+
+  /* ---------- map svg elements ---------- */
+
+  .edge {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+
+  .edge.visited { stroke: var(--accent); stroke-width: 2; }
+  .edge.flash { stroke: var(--rust); stroke-width: 2.6; }
+
+  .room-node circle.ring {
+    fill: var(--ground-raised);
+    stroke: var(--line-strong);
+    stroke-width: 1.4;
+    transition: stroke 0.3s ease, fill 0.3s ease;
+  }
+
+  .room-node.visited circle.ring { stroke: var(--accent); }
+  .room-node.current circle.ring { fill: var(--accent); stroke: var(--accent); }
+  .room-node.flash circle.ring { stroke: var(--rust); fill: color-mix(in srgb, var(--rust) 20%, var(--ground-raised)); }
+
+  .room-node .glyph { fill: none; stroke: var(--ink-dim); transition: stroke 0.3s ease; }
+  .room-node.current .glyph { stroke: var(--accent-ink); }
+
+  .room-node text {
+    font-family: var(--font-mono);
+    font-size: 7.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    fill: var(--ink-faint);
+  }
+
+  .room-node.current text, .room-node.visited text { fill: var(--ink-dim); }
+
+  .marker {
+    fill: var(--gold);
+    stroke: var(--ground);
+    stroke-width: 1.2;
+    transition: cx 0.5s cubic-bezier(.4,0,.2,1), cy 0.5s cubic-bezier(.4,0,.2,1);
+  }
+</style>
+
+<header>
+  <h1>The Estate <em>Expedition</em></h1>
+  <div class="recording-picker">
+    <label for="recording-select">Recording</label>
+    <select id="recording-select"></select>
+  </div>
+  <div class="header-meta" id="header-meta">loading transcript…</div>
+</header>
+
+<main>
+  <section class="map-pane">
+    <h2>Grounds &amp; chambers</h2>
+    <svg id="map-svg" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" aria-label="Map of the estate"></svg>
+    <div class="room-caption" id="room-caption">&nbsp;</div>
+  </section>
+
+  <section class="journal-pane">
+    <h2>Field journal</h2>
+    <div id="journal"><p class="entry-empty">Press play to begin the expedition.</p></div>
+  </section>
+</main>
+
+<footer>
+  <div class="ledger">
+    <div class="ledger-item">
+      <span class="ledger-label">Turn</span>
+      <span class="ledger-value" id="stat-turn">0 / 0</span>
+    </div>
+    <div class="ledger-item">
+      <span class="ledger-label">Tokens in / out</span>
+      <span class="ledger-value" id="stat-io">0 / 0</span>
+    </div>
+    <div class="ledger-item">
+      <span class="ledger-label">Cache read / write</span>
+      <span class="ledger-value" id="stat-cache">0 / 0</span>
+    </div>
+    <div class="ledger-item spacer"></div>
+    <div class="ledger-item">
+      <span class="ledger-label">5-hour window</span>
+      <span class="ledger-value" id="stat-5h">—</span>
+      <div class="gauge"><div class="gauge-fill" id="gauge-5h"></div></div>
+    </div>
+    <div class="ledger-item">
+      <span class="ledger-label">7-day window</span>
+      <span class="ledger-value" id="stat-7d">—</span>
+      <div class="gauge"><div class="gauge-fill" id="gauge-7d"></div></div>
+    </div>
+  </div>
+
+  <div class="transport">
+    <button id="restart-btn" title="Restart (Home)">⟲ Restart</button>
+    <button id="back-btn" title="Step back (←)">◁ Step</button>
+    <button id="play-toggle" title="Play / Pause (Space)">▶ Play</button>
+    <button id="fwd-btn" title="Step forward (→)">Step ▷</button>
+    <input type="range" id="scrubber" min="0" value="0" step="1">
+    <span class="step-count" id="step-count">0 / 0</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const RECORDINGS = [
+    { file: 'showcase.json', label: 'Showcase — a full hunt' },
+    { file: 'guardrails.json', label: 'Guardrails — turn cap trips' },
+    { file: 'tool-failure-recovery.json', label: 'Tool failure & recovery' },
+    { file: 'planning-dependencies.json', label: 'Planning & dependencies' },
+    { file: 'prompt-injection.json', label: 'Untrusted output & prompt injection' },
+  ];
+
+  const ROOM_POS = {
+    attic:     { x: 150, y: 46,  glyph: 'chest' },
+    tower:     { x: 150, y: 150, glyph: 'tower' },
+    courtyard: { x: 150, y: 254, glyph: 'fountain' },
+    garden:    { x: 232, y: 254, glyph: 'leaf' },
+    entrance:  { x: 150, y: 358, glyph: 'gate' },
+  };
+
+  const EDGES = [
+    ['entrance', 'courtyard'],
+    ['courtyard', 'tower'],
+    ['tower', 'attic'],
+    ['courtyard', 'garden'],
+    ['garden', 'tower'],
+  ];
+
+  const GLYPHS = {
+    gate: 'M -6 5 L -6 -5 M 6 5 L 6 -5 M -6 -5 Q 0 -9 6 -5 M -3 5 L -3 -2 M 3 5 L 3 -2',
+    fountain: 'M -6 4 L 6 4 M -4 4 L -4 0 Q 0 -4 4 0 L 4 4 M 0 0 L 0 -6',
+    leaf: 'M 0 -6 Q 6 -2 0 6 Q -6 -2 0 -6 M 0 -6 L 0 6',
+    tower: 'M -4 5 L -4 -5 L 4 -5 L 4 5 M -4 -5 L -4 -8 M 4 -5 L 4 -8 M -6 -8 L 6 -8',
+    chest: 'M -6 2 L 6 2 L 6 6 L -6 6 Z M -6 2 Q -6 -4 0 -4 Q 6 -4 6 2 M -2 4 L 2 4',
+  };
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.getElementById('map-svg');
+
+  function node(tag, attrs) {
+    const el = document.createElementNS(svgNS, tag);
+    for (const k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+
+  function roughPath(x1, y1, x2, y2, seed) {
+    const mx = (x1 + x2) / 2 + Math.sin(seed) * 6;
+    const my = (y1 + y2) / 2 + Math.cos(seed) * 6;
+    return `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
+  }
+
+  const edgeEls = {};
+  EDGES.forEach(([a, b], i) => {
+    const pa = ROOM_POS[a], pb = ROOM_POS[b];
+    const path = node('path', { class: 'edge', d: roughPath(pa.x, pa.y, pb.x, pb.y, i * 1.7) });
+    svg.appendChild(path);
+    edgeEls[`${a}|${b}`] = path;
+    edgeEls[`${b}|${a}`] = path;
+  });
+
+  const roomEls = {};
+  for (const name in ROOM_POS) {
+    const p = ROOM_POS[name];
+    const g = node('g', { class: 'room-node', 'data-room': name, transform: `translate(${p.x},${p.y})` });
+    g.appendChild(node('circle', { class: 'ring', r: 15 }));
+    const glyph = node('path', { class: 'glyph', d: GLYPHS[p.glyph], 'stroke-width': 1.3 });
+    g.appendChild(glyph);
+    const label = node('text', { x: 0, y: 26, 'text-anchor': 'middle' });
+    label.textContent = name;
+    g.appendChild(label);
+    svg.appendChild(g);
+    roomEls[name] = g;
+  }
+
+  const marker = node('circle', { class: 'marker', r: 4 });
+  svg.appendChild(marker);
+
+  // ---------- state ----------
+
+  let transcript = null;
+  let index = -1;       // index of last applied event, -1 = nothing applied
+  let playing = false;
+  let timer = null;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const state = {
+    room: null,
+    visited: new Set(),
+    turns: 0,
+    input: 0, output: 0, cacheRead: 0, cacheCreation: 0,
+  };
+
+  const journalEl = document.getElementById('journal');
+  const roomCaption = document.getElementById('room-caption');
+  const scrubber = document.getElementById('scrubber');
+  const stepCount = document.getElementById('step-count');
+  const playToggle = document.getElementById('play-toggle');
+
+  function setRoom(name) {
+    state.room = name;
+    state.visited.add(name);
+    for (const r in roomEls) {
+      const el = roomEls[r];
+      el.classList.toggle('current', r === name);
+      el.classList.toggle('visited', state.visited.has(r) && r !== name);
+    }
+    const p = ROOM_POS[name];
+    marker.setAttribute('cx', p.x);
+    marker.setAttribute('cy', p.y);
+    roomCaption.textContent = transcript.rooms[name].description;
+  }
+
+  function flashEdgeTo(name) {
+    for (const key in edgeEls) {
+      if (key.endsWith(`|${name}`)) edgeEls[key].classList.add('visited');
+    }
+  }
+
+  function flashFail(name) {
+    const el = roomEls[name];
+    el.classList.add('flash');
+    setTimeout(() => el.classList.remove('flash'), reduceMotion ? 0 : 650);
+  }
+
+  function addEntry({ cls, glyph, label, text }, animate) {
+    const empty = journalEl.querySelector('.entry-empty');
+    if (empty) empty.remove();
+    const entry = document.createElement('div');
+    entry.className = `entry ${cls}${animate ? '' : ' no-anim'}`;
+    entry.innerHTML = `
+      <div class="entry-glyph">${glyph}</div>
+      <div class="entry-body">
+        ${label ? `<div class="entry-label">${label}</div>` : ''}
+        <div class="entry-text">${text}</div>
+      </div>`;
+    journalEl.appendChild(entry);
+    journalEl.scrollTop = journalEl.scrollHeight;
+  }
+
+  function fmt(n) { return n.toLocaleString('en-US'); }
+
+  function updateLedger() {
+    document.getElementById('stat-turn').textContent = `${state.turns} / ${transcript.max_turns}`;
+    document.getElementById('stat-io').textContent = `${fmt(state.input)} / ${fmt(state.output)}`;
+    document.getElementById('stat-cache').textContent = `${fmt(state.cacheRead)} / ${fmt(state.cacheCreation)}`;
+  }
+
+  function updateGauge(id, fillId, value) {
+    if (value === null || value === undefined) { document.getElementById(id).textContent = '—'; return; }
+    const pct = Math.round(value * 100);
+    document.getElementById(id).textContent = `${pct}%`;
+    document.getElementById(fillId).style.width = `${pct}%`;
+  }
+
+  const TOOL_GLYPH = { look_around: '◎', move: '→', search_room: '✦' };
+
+  function applyEvent(ev, animate) {
+    if (ev.type === 'tool_call') {
+      if (ev.tool === 'move' && !ev.is_error) { flashEdgeTo(ev.room); setRoom(ev.room); }
+      else if (ev.room !== state.room) setRoom(ev.room);
+
+      if (ev.is_error) {
+        flashFail(ev.room);
+        addEntry({ cls: 'setback', glyph: '✕', label: `${ev.tool}(${Object.values(ev.args).join(', ')})`, text: ev.result }, animate);
+      } else {
+        const verb = ev.tool === 'move' ? `move ${Object.values(ev.args).join(', ')}` : ev.tool.replace('_', ' ');
+        addEntry({ cls: 'action', glyph: TOOL_GLYPH[ev.tool] || '•', label: verb, text: ev.result }, animate);
+      }
+    } else if (ev.type === 'text') {
+      addEntry({ cls: 'reasoning', glyph: '🧭', label: '', text: ev.text }, animate);
+    } else if (ev.type === 'usage') {
+      state.turns += 1;
+      state.input += ev.input_tokens;
+      state.output += ev.output_tokens;
+      state.cacheRead += ev.cache_read_input_tokens;
+      state.cacheCreation += ev.cache_creation_input_tokens;
+      updateLedger();
+    } else if (ev.type === 'rate_limit') {
+      updateGauge('stat-5h', 'gauge-5h', ev.five_hour);
+      updateGauge('stat-7d', 'gauge-7d', ev.seven_day);
+    } else if (ev.type === 'result') {
+      const won = ev.outcome === 'success';
+      addEntry({
+        cls: won ? 'victory' : 'setback',
+        glyph: won ? '✦' : '■',
+        label: won ? 'Expedition complete' : `Stopped: ${ev.outcome}`,
+        text: ev.text || '(no closing remark)',
+      }, animate);
+    }
+  }
+
+  function resetVisualState() {
+    journalEl.innerHTML = '<p class="entry-empty">Press play to begin the expedition.</p>';
+    state.visited = new Set();
+    state.turns = state.input = state.output = state.cacheRead = state.cacheCreation = 0;
+    for (const key in edgeEls) edgeEls[key].classList.remove('visited');
+    for (const r in roomEls) roomEls[r].classList.remove('visited', 'current', 'flash');
+    setRoom(transcript.start_room);
+    updateLedger();
+    updateGauge('stat-5h', 'gauge-5h', null);
+    updateGauge('stat-7d', 'gauge-7d', null);
+  }
+
+  function updateTransportUI() {
+    scrubber.value = index + 1;
+    stepCount.textContent = `${index + 1} / ${transcript.events.length}`;
+    document.getElementById('back-btn').disabled = index < 0;
+    document.getElementById('fwd-btn').disabled = index >= transcript.events.length - 1;
+    if (index >= transcript.events.length - 1) stop();
+  }
+
+  function goTo(target) {
+    target = Math.max(-1, Math.min(transcript.events.length - 1, target));
+    if (target === index) { updateTransportUI(); return; }
+
+    if (target > index) {
+      // Stepping forward: just append the new events, keep what's on screen.
+      for (let i = index + 1; i <= target; i++) applyEvent(transcript.events[i], true);
+    } else {
+      // Stepping back, or a scrubber jump: rebuild from scratch, no re-animating.
+      resetVisualState();
+      for (let i = 0; i <= target; i++) applyEvent(transcript.events[i], false);
+    }
+    index = target;
+    updateTransportUI();
+  }
+
+  function step() { goTo(index + 1); }
+
+  function play() {
+    if (index >= transcript.events.length - 1) goTo(-1);
+    playing = true;
+    playToggle.textContent = '❚❚ Pause';
+    timer = setInterval(() => {
+      if (index >= transcript.events.length - 1) { stop(); return; }
+      step();
+    }, 900);
+  }
+
+  function stop() {
+    playing = false;
+    playToggle.textContent = '▶ Play';
+    clearInterval(timer);
+  }
+
+  playToggle.addEventListener('click', () => (playing ? stop() : play()));
+  document.getElementById('back-btn').addEventListener('click', () => { stop(); goTo(index - 1); });
+  document.getElementById('fwd-btn').addEventListener('click', () => { stop(); step(); });
+  document.getElementById('restart-btn').addEventListener('click', () => { stop(); goTo(-1); });
+  scrubber.addEventListener('input', () => { stop(); goTo(parseInt(scrubber.value, 10) - 1); });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.code === 'Space') { e.preventDefault(); playing ? stop() : play(); }
+    else if (e.code === 'ArrowRight') { stop(); step(); }
+    else if (e.code === 'ArrowLeft') { stop(); goTo(index - 1); }
+    else if (e.code === 'Home') { stop(); goTo(-1); }
+  });
+
+  const recordingSelect = document.getElementById('recording-select');
+  const headerMeta = document.getElementById('header-meta');
+
+  RECORDINGS.forEach((rec) => {
+    const opt = document.createElement('option');
+    opt.value = rec.file;
+    opt.textContent = rec.label;
+    recordingSelect.appendChild(opt);
+  });
+
+  function loadTranscript(file) {
+    stop();
+    headerMeta.textContent = 'loading transcript…';
+    return fetch(file)
+      .then((r) => r.json())
+      .then((data) => {
+        transcript = data;
+        index = -1;
+        scrubber.max = data.events.length;
+        headerMeta.innerHTML = `${data.model}<br>cap: ${data.max_turns} turns · $${data.max_budget_usd.toFixed(2)}`;
+        resetVisualState();
+        updateTransportUI();
+      })
+      .catch((err) => {
+        headerMeta.textContent = 'failed to load transcript';
+        console.error(err);
+      });
+  }
+
+  recordingSelect.addEventListener('change', () => loadTranscript(recordingSelect.value));
+
+  loadTranscript(recordingSelect.value || RECORDINGS[0].file);
+})();
+</script>
