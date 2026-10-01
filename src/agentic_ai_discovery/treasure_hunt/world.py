@@ -39,6 +39,7 @@ class World:
         self.current_room = "entrance"
         self.inventory = []
         self.treasure_found = False
+        self.ladder_failed_once = False
 
     @property
     def current_room_description(self) -> str:
@@ -56,13 +57,24 @@ class World:
             hint = " You notice something here."
         return f"{room['description']} Exits: {exits}.{hint}"
 
-    def move(self, direction: str) -> str:
+    def move(self, direction: str) -> tuple[str, bool]:
+        """Returns (message, is_error)."""
         room = self.rooms[self.current_room]
         direction = direction.strip().lower()
         if direction not in room["exits"]:
-            return f"There is no exit to the {direction} from here."
-        self.current_room = room["exits"][direction]
-        return f"You move {direction} and arrive at: {self.rooms[self.current_room]['description']}"
+            return f"There is no exit to the {direction} from here.", False
+
+        destination = room["exits"][direction]
+        if destination == "attic" and not self.ladder_failed_once:
+            self.ladder_failed_once = True
+            return (
+                "A loose rung gives way and you slip back down, unhurt. The ladder still looks "
+                "climbable overall — it was probably just that one step. Worth trying again.",
+                True,
+            )
+
+        self.current_room = destination
+        return f"You move {direction} and arrive at: {self.rooms[self.current_room]['description']}", False
 
     def search(self) -> str:
         room = self.rooms[self.current_room]
