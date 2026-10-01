@@ -54,13 +54,20 @@ async def run_treasure_hunt() -> None:
             max_budget_usd=max_budget_usd,
         )
 
+        # The SDK can split one API response into several AssistantMessage
+        # objects (e.g. a ThinkingBlock message plus one ToolUseBlock message
+        # per tool call) that all carry the SAME response-level `usage` —
+        # dedupe by message_id so each real turn is only counted once.
+        seen_message_ids: set[str] = set()
+
         try:
             async for message in query(
                 prompt="Begin exploring. Find the treasure.",
                 options=options,
             ):
                 if isinstance(message, AssistantMessage):
-                    if message.usage:
+                    if message.usage and message.message_id not in seen_message_ids:
+                        seen_message_ids.add(message.message_id)
                         dashboard.add_turn_usage(message.usage)
                     for block in message.content:
                         if getattr(block, "text", None):
