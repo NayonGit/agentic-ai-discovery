@@ -66,6 +66,9 @@ class TranscriptRecorder:
             }
         )
 
+    def approval(self, tool: str, approved: bool, note: str) -> None:
+        self.data["events"].append({"type": "approval", "tool": tool, "approved": approved, "note": note})
+
     def result(self, outcome: str, text: str | None, total_cost_usd: float | None, total_turns: int) -> None:
         self.data["events"].append(
             {

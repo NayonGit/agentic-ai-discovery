@@ -4,6 +4,7 @@ import os
 from claude_agent_sdk import (
     AssistantMessage,
     ClaudeAgentOptions,
+    HookMatcher,
     RateLimitEvent,
     ResultError,
     ResultMessage,
@@ -12,7 +13,7 @@ from claude_agent_sdk import (
 
 from .dashboard import Dashboard
 from .recorder import TranscriptRecorder
-from .tools import ALLOWED_TOOLS, build_game_server
+from .tools import ALLOWED_TOOLS, FORCE_DOOR_TOOL, build_game_server
 from .world import ROOMS
 
 SYSTEM_PROMPT = """You are an explorer in a small text-based treasure hunt.
@@ -47,13 +48,32 @@ async def run_treasure_hunt() -> None:
         server, world = build_game_server(dashboard, recorder)
         dashboard.set_room(world.current_room, world.current_room_description, world.current_room_exits)
 
+        async def gate_force_door(hook_input, tool_use_id, context):
+            if hook_input.get("tool_name") != FORCE_DOOR_TOOL:
+                return {}  # not our concern - let normal permission rules apply
+
+            approved = await dashboard.ask_approval(
+                "\n⚠️  The agent wants to force the tower door open (risky, irreversible). Approve? [y/N] "
+            )
+            note = "approved by the user" if approved else "denied by the user"
+            dashboard.log(f"{'✅' if approved else '🚫'} force_door request {note}")
+            recorder.approval("force_door", approved, note)
+            return {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "allow" if approved else "deny",
+                    "permissionDecisionReason": note,
+                }
+            }
+
         options = ClaudeAgentOptions(
             model=MODEL,
             tools=[],  # no built-in Claude Code tools (Bash, Read, Edit, ...) — only our 3 MCP tools
             skills=[],  # don't load the host's personal Claude Code skills into this game's context
             mcp_servers={"treasure_hunt": server},
-            allowed_tools=ALLOWED_TOOLS,
+            allowed_tools=ALLOWED_TOOLS,  # force_door is deliberately excluded - gated via the hook below
             permission_mode="bypassPermissions",
+            hooks={"PreToolUse": [HookMatcher(hooks=[gate_force_door])]},
             system_prompt=SYSTEM_PROMPT,
             max_turns=max_turns,
             max_budget_usd=max_budget_usd,
