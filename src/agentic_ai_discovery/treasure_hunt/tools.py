@@ -3,6 +3,7 @@ from typing import Any
 from claude_agent_sdk import create_sdk_mcp_server, tool
 
 from .dashboard import Dashboard
+from .recorder import TranscriptRecorder
 from .world import World
 
 SERVER_NAME = "treasure_hunt"
@@ -13,10 +14,11 @@ ALLOWED_TOOLS = [
 ]
 
 
-def build_game_server(dashboard: Dashboard) -> tuple[Any, World]:
+def build_game_server(dashboard: Dashboard, recorder: TranscriptRecorder) -> tuple[Any, World]:
     """Create a fresh World and wrap it in custom tools bound to that instance.
-    Each tool reports what it did to the dashboard, then waits for the user
-    to confirm they've read it before letting the agent take its next step."""
+    Each tool reports what it did to the dashboard and the recorder, then
+    waits for the user to confirm they've read it before letting the agent
+    take its next step."""
     world = World()
 
     def _sync_room() -> None:
@@ -26,6 +28,7 @@ def build_game_server(dashboard: Dashboard) -> tuple[Any, World]:
     async def look_around(_args: dict[str, Any]) -> dict[str, Any]:
         result = world.look()
         dashboard.log(f"🔧 look_around → {result}")
+        recorder.tool_call("look_around", {}, result, False, world.current_room, world.current_room_exits, world.inventory)
         await dashboard.wait_for_step()
         return {"content": [{"type": "text", "text": result}]}
 
@@ -39,6 +42,7 @@ def build_game_server(dashboard: Dashboard) -> tuple[Any, World]:
         _sync_room()
         marker = "❌" if is_error else "🔧"
         dashboard.log(f"{marker} move({args['direction']}) → {result}")
+        recorder.tool_call("move", args, result, is_error, world.current_room, world.current_room_exits, world.inventory)
         await dashboard.wait_for_step()
         return {"content": [{"type": "text", "text": result}], "is_error": is_error}
 
@@ -46,6 +50,7 @@ def build_game_server(dashboard: Dashboard) -> tuple[Any, World]:
     async def search_room(_args: dict[str, Any]) -> dict[str, Any]:
         result = world.search()
         dashboard.log(f"🔧 search_room → {result}")
+        recorder.tool_call("search_room", {}, result, False, world.current_room, world.current_room_exits, world.inventory)
         await dashboard.wait_for_step()
         return {"content": [{"type": "text", "text": result}]}
 
