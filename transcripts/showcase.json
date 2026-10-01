@@ -1,0 +1,473 @@
+{
+  "rooms": {
+    "entrance": {
+      "description": "A crumbling stone gate marks the entrance to the old estate. Ivy swallows the walls.",
+      "exits": {
+        "north": "courtyard"
+      }
+    },
+    "courtyard": {
+      "description": "An overgrown courtyard. A dry fountain sits at its center.",
+      "exits": {
+        "south": "entrance",
+        "north": "tower",
+        "east": "garden"
+      }
+    },
+    "garden": {
+      "description": "A tangled garden, roses gone wild. Something glints beneath a bush.",
+      "exits": {
+        "west": "courtyard",
+        "north": "tower"
+      }
+    },
+    "tower": {
+      "description": "A narrow stone tower. A ladder leads up into darkness.",
+      "exits": {
+        "south": "courtyard",
+        "up": "attic",
+        "west": "garden"
+      }
+    },
+    "attic": {
+      "description": "A dusty attic, moonlight slipping through a cracked roof.",
+      "exits": {
+        "down": "tower"
+      }
+    }
+  },
+  "start_room": "entrance",
+  "max_turns": 20,
+  "max_budget_usd": 0.5,
+  "model": "claude-sonnet-5",
+  "events": [
+    {
+      "type": "rate_limit",
+      "five_hour": 0.58,
+      "seven_day": 0.53
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 6,
+      "cache_read_input_tokens": 1179,
+      "cache_creation_input_tokens": 0
+    },
+    {
+      "type": "tool_call",
+      "tool": "look_around",
+      "args": {},
+      "result": "A crumbling stone gate marks the entrance to the old estate. Ivy swallows the walls. Exits: north.",
+      "is_error": false,
+      "room": "entrance",
+      "exits": [
+        "north"
+      ],
+      "inventory": []
+    },
+    {
+      "type": "rate_limit",
+      "five_hour": 0.59,
+      "seven_day": 0.53
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 2,
+      "cache_read_input_tokens": 8700,
+      "cache_creation_input_tokens": 1494
+    },
+    {
+      "type": "tool_call",
+      "tool": "search_room",
+      "args": {},
+      "result": "You search carefully but find nothing of interest here.",
+      "is_error": false,
+      "room": "entrance",
+      "exits": [
+        "north"
+      ],
+      "inventory": []
+    },
+    {
+      "type": "tool_call",
+      "tool": "move",
+      "args": {
+        "direction": "north"
+      },
+      "result": "You move north and arrive at: An overgrown courtyard. A dry fountain sits at its center.",
+      "is_error": false,
+      "room": "courtyard",
+      "exits": [
+        "south",
+        "north",
+        "east"
+      ],
+      "inventory": []
+    },
+    {
+      "type": "rate_limit",
+      "five_hour": 0.58,
+      "seven_day": 0.53
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 122943,
+      "cache_creation_input_tokens": 2031
+    },
+    {
+      "type": "tool_call",
+      "tool": "look_around",
+      "args": {},
+      "result": "An overgrown courtyard. A dry fountain sits at its center. Exits: south, north, east. You notice something here.",
+      "is_error": false,
+      "room": "courtyard",
+      "exits": [
+        "south",
+        "north",
+        "east"
+      ],
+      "inventory": []
+    },
+    {
+      "type": "tool_call",
+      "tool": "search_room",
+      "args": {},
+      "result": "You found a torn map fragment. A faded note scrawled on it reads: 'X marks the spot \u2014 beneath the dry fountain.' You add the fragment to your inventory.",
+      "is_error": false,
+      "room": "courtyard",
+      "exits": [
+        "south",
+        "north",
+        "east"
+      ],
+      "inventory": [
+        "a torn map fragment"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 8,
+      "cache_read_input_tokens": 124974,
+      "cache_creation_input_tokens": 330
+    },
+    {
+      "type": "tool_call",
+      "tool": "search_room",
+      "args": {},
+      "result": "You've already collected everything here.",
+      "is_error": false,
+      "room": "courtyard",
+      "exits": [
+        "south",
+        "north",
+        "east"
+      ],
+      "inventory": [
+        "a torn map fragment"
+      ]
+    },
+    {
+      "type": "rate_limit",
+      "five_hour": 0.59,
+      "seven_day": 0.53
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 7,
+      "cache_read_input_tokens": 125304,
+      "cache_creation_input_tokens": 225
+    },
+    {
+      "type": "tool_call",
+      "tool": "move",
+      "args": {
+        "direction": "down"
+      },
+      "result": "There is no exit to the down from here.",
+      "is_error": false,
+      "room": "courtyard",
+      "exits": [
+        "south",
+        "north",
+        "east"
+      ],
+      "inventory": [
+        "a torn map fragment"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 8,
+      "cache_read_input_tokens": 125529,
+      "cache_creation_input_tokens": 226
+    },
+    {
+      "type": "tool_call",
+      "tool": "move",
+      "args": {
+        "direction": "east"
+      },
+      "result": "You move east and arrive at: A tangled garden, roses gone wild. Something glints beneath a bush.",
+      "is_error": false,
+      "room": "garden",
+      "exits": [
+        "west",
+        "north"
+      ],
+      "inventory": [
+        "a torn map fragment"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 125755,
+      "cache_creation_input_tokens": 226
+    },
+    {
+      "type": "tool_call",
+      "tool": "search_room",
+      "args": {},
+      "result": "You found a rusty key and added it to your inventory.",
+      "is_error": false,
+      "room": "garden",
+      "exits": [
+        "west",
+        "north"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "tool_call",
+      "tool": "look_around",
+      "args": {},
+      "result": "A tangled garden, roses gone wild. Something glints beneath a bush. Exits: west, north.",
+      "is_error": false,
+      "room": "garden",
+      "exits": [
+        "west",
+        "north"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 3,
+      "cache_read_input_tokens": 125981,
+      "cache_creation_input_tokens": 286
+    },
+    {
+      "type": "tool_call",
+      "tool": "search_room",
+      "args": {},
+      "result": "You've already collected everything here.",
+      "is_error": false,
+      "room": "garden",
+      "exits": [
+        "west",
+        "north"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 4,
+      "cache_read_input_tokens": 126267,
+      "cache_creation_input_tokens": 160
+    },
+    {
+      "type": "text",
+      "text": "Good, got a rusty key. Let's continue exploring."
+    },
+    {
+      "type": "tool_call",
+      "tool": "move",
+      "args": {
+        "direction": "north"
+      },
+      "result": "You move north and arrive at: A narrow stone tower. A ladder leads up into darkness.",
+      "is_error": false,
+      "room": "tower",
+      "exits": [
+        "south",
+        "up",
+        "west"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 126427,
+      "cache_creation_input_tokens": 197
+    },
+    {
+      "type": "tool_call",
+      "tool": "search_room",
+      "args": {},
+      "result": "You search carefully but find nothing of interest here.",
+      "is_error": false,
+      "room": "tower",
+      "exits": [
+        "south",
+        "up",
+        "west"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "tool_call",
+      "tool": "look_around",
+      "args": {},
+      "result": "A narrow stone tower. A ladder leads up into darkness. Exits: south, up, west.",
+      "is_error": false,
+      "room": "tower",
+      "exits": [
+        "south",
+        "up",
+        "west"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 126624,
+      "cache_creation_input_tokens": 283
+    },
+    {
+      "type": "tool_call",
+      "tool": "move",
+      "args": {
+        "direction": "up"
+      },
+      "result": "A loose rung gives way and you slip back down, unhurt. The ladder still looks climbable overall \u2014 it was probably just that one step. Worth trying again.",
+      "is_error": true,
+      "room": "tower",
+      "exits": [
+        "south",
+        "up",
+        "west"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 126907,
+      "cache_creation_input_tokens": 205
+    },
+    {
+      "type": "tool_call",
+      "tool": "move",
+      "args": {
+        "direction": "up"
+      },
+      "result": "You move up and arrive at: A dusty attic, moonlight slipping through a cracked roof.",
+      "is_error": false,
+      "room": "attic",
+      "exits": [
+        "down"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key"
+      ]
+    },
+    {
+      "type": "rate_limit",
+      "five_hour": 0.59,
+      "seven_day": 0.54
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 127112,
+      "cache_creation_input_tokens": 176
+    },
+    {
+      "type": "tool_call",
+      "tool": "search_room",
+      "args": {},
+      "result": "You pry open a dusty chest and find THE TREASURE! You win!",
+      "is_error": false,
+      "room": "attic",
+      "exits": [
+        "down"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key",
+        "the treasure chest"
+      ]
+    },
+    {
+      "type": "tool_call",
+      "tool": "look_around",
+      "args": {},
+      "result": "A dusty attic, moonlight slipping through a cracked roof. Exits: down.",
+      "is_error": false,
+      "room": "attic",
+      "exits": [
+        "down"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "a rusty key",
+        "the treasure chest"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 8,
+      "cache_read_input_tokens": 127288,
+      "cache_creation_input_tokens": 288
+    },
+    {
+      "type": "text",
+      "text": "\ud83c\udfc6 **Treasure found!** \n\nThe path was: Gate \u2192 north to the Courtyard (found a map fragment) \u2192 east to the Garden (found a rusty key) \u2192 north to the Tower \u2192 up (slipped once, tried again) \u2192 into the Attic, where I pried open a dusty chest and found **THE TREASURE**! Victory! \ud83c\udf89"
+    },
+    {
+      "type": "result",
+      "outcome": "success",
+      "text": "\ud83c\udfc6 **Treasure found!** \n\nThe path was: Gate \u2192 north to the Courtyard (found a map fragment) \u2192 east to the Garden (found a rusty key) \u2192 north to the Tower \u2192 up (slipped once, tried again) \u2192 into the Attic, where I pried open a dusty chest and found **THE TREASURE**! Victory! \ud83c\udf89",
+      "total_cost_usd": 0.34150600000000003,
+      "total_turns": 14
+    }
+  ]
+}

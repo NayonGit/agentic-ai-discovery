@@ -97,4 +97,19 @@ failure. In the one live run so far, the agent explored the garden and
 picked up the key before ever trying the tower, so the lock was never
 actually triggered — an inconclusive result in itself worth reading about in
 `NOTES.md`, since it's not the same kind of lesson as the guardrail or
-tool-failure stones above.
+tool-failure stones above. (A later run did trigger it, and recovered
+correctly — see the update in `NOTES.md`.)
+
+### Replay visualizer
+
+Every run can save a structured JSON transcript (`TRANSCRIPT_FILE=path uv run
+treasure-hunt`) — the map, every tool call/result, reasoning text, token
+usage, and rate-limit snapshots, in order. `transcripts/showcase.json` is one
+such recording, replayed by a standalone Artifact ("The Estate Expedition"):
+a hand-drawn-style map with an animated position marker, a field-journal log
+of the agent's actions, and a ledger of token/rate-limit stats, with
+play/pause/step/scrubber controls. Built to iterate on the visuals for free
+against one real recording, instead of spending live runs on UI polish.
+
+`transcripts/` keeps one recording per stone below, named to match its
+`NOTES.md` section, so each lesson has a real run to replay, not just prose.

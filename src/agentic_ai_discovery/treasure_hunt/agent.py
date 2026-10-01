@@ -11,12 +11,15 @@ from claude_agent_sdk import (
 )
 
 from .dashboard import Dashboard
+from .recorder import TranscriptRecorder
 from .tools import ALLOWED_TOOLS, build_game_server
 from .world import ROOMS
 
 SYSTEM_PROMPT = """You are an explorer in a small text-based treasure hunt.
 Use the tools to look around, move between rooms, and search for hidden items.
 Explore methodically until you find the treasure, then report that you've won."""
+
+MODEL = "claude-sonnet-5"
 
 # Generous enough that a normal hunt always finishes comfortably. To see the
 # guardrails actually trip, force them low, e.g.:
@@ -32,18 +35,20 @@ async def run_treasure_hunt() -> None:
     back, and repeats until the model decides the hunt is over — or until a
     guardrail (max turns / max budget) cuts it off first. A live dashboard
     shows the map, the agent's running commentary, and how much of the
-    subscription's rate-limit windows this run is using."""
+    subscription's rate-limit windows this run is using. If TRANSCRIPT_FILE
+    is set, the whole run is also saved as a replayable JSON transcript."""
     max_turns = int(os.environ.get("MAX_TURNS", DEFAULT_MAX_TURNS))
     max_budget_usd = float(os.environ.get("MAX_BUDGET_USD", DEFAULT_MAX_BUDGET_USD))
 
     dashboard = Dashboard(room_names=list(ROOMS.keys()), max_turns=max_turns, max_budget_usd=max_budget_usd)
+    recorder = TranscriptRecorder(start_room="entrance", max_turns=max_turns, max_budget_usd=max_budget_usd, model=MODEL)
 
     with dashboard:
-        server, world = build_game_server(dashboard)
+        server, world = build_game_server(dashboard, recorder)
         dashboard.set_room(world.current_room, world.current_room_description, world.current_room_exits)
 
         options = ClaudeAgentOptions(
-            model="claude-sonnet-5",
+            model=MODEL,
             tools=[],  # no built-in Claude Code tools (Bash, Read, Edit, ...) — only our 3 MCP tools
             skills=[],  # don't load the host's personal Claude Code skills into this game's context
             mcp_servers={"treasure_hunt": server},
@@ -69,16 +74,21 @@ async def run_treasure_hunt() -> None:
                     if message.usage and message.message_id not in seen_message_ids:
                         seen_message_ids.add(message.message_id)
                         dashboard.add_turn_usage(message.usage)
+                        recorder.usage(message.usage)
                     for block in message.content:
                         if getattr(block, "text", None):
                             dashboard.log(f"🧭 {block.text}")
+                            recorder.text(block.text)
                 elif isinstance(message, RateLimitEvent):
                     dashboard.update_rate_limits(message.rate_limit_info.raw)
+                    recorder.rate_limit(message.rate_limit_info.raw)
                 elif isinstance(message, ResultMessage):
                     if message.subtype == "success":
                         dashboard.log(f"🏆 {message.result}")
+                        recorder.result("success", message.result, message.total_cost_usd, dashboard.turns)
                     else:
                         dashboard.log(f"⏱️ Stopped: {message.subtype}")
+                        recorder.result(message.subtype, message.result, message.total_cost_usd, dashboard.turns)
         except ResultError as e:
             spent = e.data.get("total_cost_usd")
             spent_str = f"${spent:.4f}" if isinstance(spent, (int, float)) else "unknown"
@@ -91,6 +101,11 @@ async def run_treasure_hunt() -> None:
                 )
             else:
                 dashboard.log(f"🛑 Stopped early: {e.subtype} ({e.terminal_reason})")
+            recorder.result(e.subtype or "error", e.result, spent, dashboard.turns)
+
+    transcript_file = os.environ.get("TRANSCRIPT_FILE")
+    if transcript_file:
+        recorder.save(transcript_file)
 
 
 def main() -> None:
