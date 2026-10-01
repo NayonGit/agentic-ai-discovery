@@ -43,6 +43,9 @@ async def run_treasure_hunt() -> None:
         dashboard.set_room(world.current_room, world.current_room_description, world.current_room_exits)
 
         options = ClaudeAgentOptions(
+            model="claude-sonnet-5",
+            tools=[],  # no built-in Claude Code tools (Bash, Read, Edit, ...) — only our 3 MCP tools
+            skills=[],  # don't load the host's personal Claude Code skills into this game's context
             mcp_servers={"treasure_hunt": server},
             allowed_tools=ALLOWED_TOOLS,
             permission_mode="bypassPermissions",
@@ -51,13 +54,20 @@ async def run_treasure_hunt() -> None:
             max_budget_usd=max_budget_usd,
         )
 
+        # The SDK can split one API response into several AssistantMessage
+        # objects (e.g. a ThinkingBlock message plus one ToolUseBlock message
+        # per tool call) that all carry the SAME response-level `usage` —
+        # dedupe by message_id so each real turn is only counted once.
+        seen_message_ids: set[str] = set()
+
         try:
             async for message in query(
                 prompt="Begin exploring. Find the treasure.",
                 options=options,
             ):
                 if isinstance(message, AssistantMessage):
-                    if message.usage:
+                    if message.usage and message.message_id not in seen_message_ids:
+                        seen_message_ids.add(message.message_id)
                         dashboard.add_turn_usage(message.usage)
                     for block in message.content:
                         if getattr(block, "text", None):
