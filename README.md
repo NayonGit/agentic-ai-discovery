@@ -88,3 +88,13 @@ behavior completely: an ambiguous failure ("you slip and land back where you
 started") led it to explore the entire rest of the map before trying the
 ladder again, while an explicit retry hint ("worth trying again") led it to
 retry on the very next action. See `NOTES.md` for the full writeup.
+
+### Planning & multi-step dependencies
+
+The tower is locked unless the rusty key (sitting in the garden, a side room)
+is already in the inventory — a genuine prerequisite rather than a one-shot
+failure. In the one live run so far, the agent explored the garden and
+picked up the key before ever trying the tower, so the lock was never
+actually triggered — an inconclusive result in itself worth reading about in
+`NOTES.md`, since it's not the same kind of lesson as the guardrail or
+tool-failure stones above.

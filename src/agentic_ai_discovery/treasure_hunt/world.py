@@ -65,6 +65,9 @@ class World:
             return f"There is no exit to the {direction} from here.", False
 
         destination = room["exits"][direction]
+        if destination == "tower" and "a rusty key" not in self.inventory:
+            return "The tower's heavy door is locked tight. It looks like it needs a key.", False
+
         if destination == "attic" and not self.ladder_failed_once:
             self.ladder_failed_once = True
             return (
