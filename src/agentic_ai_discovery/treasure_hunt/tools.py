@@ -35,11 +35,12 @@ def build_game_server(dashboard: Dashboard) -> tuple[Any, World]:
         {"direction": str},
     )
     async def move(args: dict[str, Any]) -> dict[str, Any]:
-        result = world.move(args["direction"])
+        result, is_error = world.move(args["direction"])
         _sync_room()
-        dashboard.log(f"🔧 move({args['direction']}) → {result}")
+        marker = "❌" if is_error else "🔧"
+        dashboard.log(f"{marker} move({args['direction']}) → {result}")
         await dashboard.wait_for_step()
-        return {"content": [{"type": "text", "text": result}]}
+        return {"content": [{"type": "text", "text": result}], "is_error": is_error}
 
     @tool("search_room", "Search the current room thoroughly for hidden items.", {})
     async def search_room(_args: dict[str, Any]) -> dict[str, Any]:

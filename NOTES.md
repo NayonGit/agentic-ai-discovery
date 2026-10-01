@@ -27,3 +27,15 @@ Switched to `claude-sonnet-5` and stripped the Claude Code harness's own built-i
 **Bug: double-counting turns/tokens.** The SDK can split one API response into several `AssistantMessage` objects (a thinking-block message plus one per tool call) that all report the *same* usage — I was summing every one, inflating displayed turns and cache totals 2-3x. This is also what caused the earlier "Turns: 23/20 but no guardrail fired" mystery. Fixed by deduping on `message_id`.
 
 **Open thread for later:** even after fixing the double-count, cache usage genuinely grows a lot across a run — not a bug, but the real cost of (a) resending the whole history every turn (stateless API) and (b) adaptive thinking generating real hidden reasoning tokens that join that history every turn. Tried `effort="low"` to shrink that — it broke caching outright (every turn paid full cache-write price, budget blown in 4 turns) for reasons I don't understand yet. Left alone on purpose rather than guessing further; worth a dedicated lesson on context management/compaction.
+
+## Tool failure & recovery — the moral of this one
+
+**What I wanted to implement:** a tool that fails like real ones do (a flaky API, a transient error), to see whether the agent notices an `is_error: true` result and recovers, instead of just assuming every tool call will succeed.
+
+**What I tried:** made climbing the ladder (the only way to the treasure) fail deterministically on the first attempt and succeed on every attempt after — deterministic, not random, so the behavior is guaranteed to show up instead of hoping for it across lucky/unlucky runs. No hint anywhere in the system prompt that this would happen, so whatever the agent did next would be its own genuine judgment call. Then, as a second pass, changed *only* the wording of the failure message — nothing else — to compare two phrasings: one ambiguous about whether retrying would help, one explicitly suggesting it might.
+
+**What I observed:** wording changed the behavior completely.
+- Ambiguous message ("you slip and land back where you started") → the agent treated the path as closed. It explored the *entire rest of the map* before ever trying the ladder again.
+- Explicit retry-hinting message ("worth trying again") → the agent retried on its *very next* action and succeeded immediately.
+
+**What to conclude for real systems:** a tool error alone doesn't tell an agent whether the failure is worth retrying — that has to be designed into the error message on purpose, it isn't something the model can infer from `is_error: true` alone. Leave it ambiguous, and an agent can burn a lot of turns (and in a real system: money, time, or worse — side effects) avoiding something that would have worked on the second try. This makes error-message wording an actual design surface, not an afterthought, right alongside the tool's schema and description. It also only took one clean before/after comparison to see this clearly — but one run is a directional signal, not proof; a real decision would want this re-run enough times to be a pattern, not a fluke (same caveat as "runs are non-deterministic" above).

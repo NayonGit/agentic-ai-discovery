@@ -74,3 +74,17 @@ the *fixed* per-turn baseline — it does nothing about the *growing* cost
 across a run (each turn resends the full history, and adaptive thinking adds
 real hidden reasoning tokens to that history every turn). That part is an
 open thread for a future lesson, not yet addressed here.
+
+### Tool failure & recovery
+
+Climbing the ladder (tower → attic, the only way to the treasure) fails
+deterministically on the first attempt with a proper `is_error: true` tool
+result, then succeeds on every attempt after — deterministic rather than
+random, so the behavior is guaranteed to show up instead of depending on
+chance. No hint in the system prompt, to see genuine, unprompted recovery.
+
+The exact wording of that error message turned out to change the agent's
+behavior completely: an ambiguous failure ("you slip and land back where you
+started") led it to explore the entire rest of the map before trying the
+ladder again, while an explicit retry hint ("worth trying again") led it to
+retry on the very next action. See `NOTES.md` for the full writeup.
