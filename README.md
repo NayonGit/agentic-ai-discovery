@@ -49,3 +49,16 @@ MAX_BUDGET_USD=0.01 uv run treasure-hunt  # hits the budget cap after turn 1
 The map also has a loop (garden ↔ tower) and a decoy clue (the courtyard's
 map fragment falsely points to the fountain) so a normal run isn't always the
 same short, straight path.
+
+### Cache footprint
+
+Runs on `claude-sonnet-5` rather than Opus, and strips the Claude Code harness's
+own built-in tools/skills/project settings from context (`tools=[]`, `skills=[]`)
+since the game only uses its own 3 MCP tools — none of that is needed here, and
+by default it all rides along in the cached prefix on every turn. Verified with
+a 1-turn run: cache footprint dropped from ~17,000 to ~2,400 tokens (~86%).
+
+Note: `setting_sources=[]` (full SDK isolation mode) looked like a natural
+fourth lever here, but it silently breaks prompt caching — every turn pays
+full cache-write price instead of reading the prior one back. Left unset on
+purpose.

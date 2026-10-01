@@ -43,6 +43,9 @@ async def run_treasure_hunt() -> None:
         dashboard.set_room(world.current_room, world.current_room_description, world.current_room_exits)
 
         options = ClaudeAgentOptions(
+            model="claude-sonnet-5",
+            tools=[],  # no built-in Claude Code tools (Bash, Read, Edit, ...) — only our 3 MCP tools
+            skills=[],  # don't load the host's personal Claude Code skills into this game's context
             mcp_servers={"treasure_hunt": server},
             allowed_tools=ALLOWED_TOOLS,
             permission_mode="bypassPermissions",
