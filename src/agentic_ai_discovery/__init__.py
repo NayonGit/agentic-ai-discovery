@@ -3,16 +3,14 @@ import os
 from anthropic import Anthropic
 from dotenv import load_dotenv
 
-load_dotenv()
-
-MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-5")
-
 
 def main() -> None:
+    load_dotenv()
+    model = os.environ.get("ANTHROPIC_MODEL", "claude-opus-5")
     client = Anthropic()
 
     response = client.messages.create(
-        model=MODEL,
+        model=model,
         max_tokens=1024,
         messages=[{"role": "user", "content": "In one sentence, what is an AI agent?"}],
     )
