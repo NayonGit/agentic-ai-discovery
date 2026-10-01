@@ -66,6 +66,17 @@ class Dashboard:
         finally:
             self._live.start(refresh=True)
 
+    async def ask_approval(self, prompt: str) -> bool:
+        """Pause the live view and ask a real yes/no question. Blank input
+        (e.g. non-interactive testing) defaults to deny - the safe default
+        for an approval gate."""
+        self._live.stop()
+        try:
+            answer = await asyncio.to_thread(input, prompt)
+        finally:
+            self._live.start(refresh=True)
+        return answer.strip().lower() in ("y", "yes")
+
     def add_turn_usage(self, usage: dict) -> None:
         self.turns += 1
         self.tokens["input"] += usage.get("input_tokens", 0) or 0

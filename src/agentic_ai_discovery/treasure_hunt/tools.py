@@ -7,11 +7,17 @@ from .recorder import TranscriptRecorder
 from .world import World
 
 SERVER_NAME = "treasure_hunt"
+
+# Auto-approved without prompting - the safe, ordinary actions.
 ALLOWED_TOOLS = [
     f"mcp__{SERVER_NAME}__look_around",
     f"mcp__{SERVER_NAME}__move",
     f"mcp__{SERVER_NAME}__search_room",
 ]
+
+# Deliberately NOT in ALLOWED_TOOLS: callable, but every invocation goes
+# through the can_use_tool approval gate in agent.py instead of auto-approving.
+FORCE_DOOR_TOOL = f"mcp__{SERVER_NAME}__force_door"
 
 
 def build_game_server(dashboard: Dashboard, recorder: TranscriptRecorder) -> tuple[Any, World]:
@@ -54,9 +60,24 @@ def build_game_server(dashboard: Dashboard, recorder: TranscriptRecorder) -> tup
         await dashboard.wait_for_step()
         return {"content": [{"type": "text", "text": result}]}
 
+    @tool(
+        "force_door",
+        "Attempt to force open a locked door without the key. Risky and irreversible - "
+        "may damage the door - and requires human approval before it takes effect.",
+        {},
+    )
+    async def force_door(_args: dict[str, Any]) -> dict[str, Any]:
+        # If this runs at all, the can_use_tool gate in agent.py already approved it.
+        result = world.force_door()
+        _sync_room()
+        dashboard.log(f"🔨 force_door → {result}")
+        recorder.tool_call("force_door", {}, result, False, world.current_room, world.current_room_exits, world.inventory)
+        await dashboard.wait_for_step()
+        return {"content": [{"type": "text", "text": result}]}
+
     server = create_sdk_mcp_server(
         name=SERVER_NAME,
         version="1.0.0",
-        tools=[look_around, move, search_room],
+        tools=[look_around, move, search_room, force_door],
     )
     return server, world

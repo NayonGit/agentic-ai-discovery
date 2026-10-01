@@ -47,6 +47,7 @@ class World:
         self.inventory = []
         self.treasure_found = False
         self.ladder_failed_once = False
+        self.tower_forced = False
 
     @property
     def current_room_description(self) -> str:
@@ -72,8 +73,12 @@ class World:
             return f"There is no exit to the {direction} from here.", False
 
         destination = room["exits"][direction]
-        if destination == "tower" and "a rusty key" not in self.inventory:
-            return "The tower's heavy door is locked tight. It looks like it needs a key.", False
+        if destination == "tower" and "a rusty key" not in self.inventory and not self.tower_forced:
+            return (
+                "The tower's heavy door is locked tight. It looks like it needs a key - "
+                "though the door looks old enough that it might also give way if forced.",
+                False,
+            )
 
         if destination == "attic" and not self.ladder_failed_once:
             self.ladder_failed_once = True
@@ -85,6 +90,22 @@ class World:
 
         self.current_room = destination
         return f"You move {direction} and arrive at: {self.rooms[self.current_room]['description']}", False
+
+    def force_door(self) -> str:
+        """Attempt to force the tower door open, bypassing the key. Only
+        reachable at all if the Agent SDK's permission gate approved this
+        call - by the time this runs, approval has already happened."""
+        room = self.rooms[self.current_room]
+        if "tower" not in room["exits"].values():
+            return "There's no locked door to force here."
+        if "a rusty key" in self.inventory or self.tower_forced:
+            return "The tower door isn't locked anymore - no need to force it."
+        self.tower_forced = True
+        self.current_room = "tower"
+        return (
+            "You throw your shoulder into the tower door. With a splintering crack, the old "
+            "lock gives way - you're in, though the door won't close properly again."
+        )
 
     def search(self) -> str:
         room = self.rooms[self.current_room]

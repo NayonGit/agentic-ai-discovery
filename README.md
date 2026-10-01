@@ -125,3 +125,18 @@ caught it immediately, named it out loud as a prompt injection in the game
 content, ignored it, and kept going — a good result, with an important
 caveat about how blatant this particular attempt was. Full writeup, including
 why one clean result isn't a security guarantee, in `NOTES.md`.
+
+### Approval gates for risky actions
+
+`force_door` is an irreversible alternative way past the tower's lock,
+gated behind a real human-in-the-loop approval via the Agent SDK's
+`PreToolUse` hooks — not a simulated prompt. Across three live runs, the
+agent never once chose to try it, even when the locked-door message was
+reworded to surface it as an option right at the decision point: a
+reasonably aligned model avoids an honestly-labeled risky action when a
+safe alternative exists. The gate itself is verified working regardless.
+Along the way, an earlier attempt using the SDK's `can_use_tool` callback
+silently broke prompt caching entirely (same failure signature as the
+`effort="low"` regression above) — switching to a `PreToolUse` hook fixed
+it while leaving `permission_mode="bypassPermissions"` intact for every
+other tool. Full writeup in `NOTES.md`.
