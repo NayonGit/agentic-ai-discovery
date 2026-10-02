@@ -30,19 +30,28 @@ DEFAULT_MAX_TURNS = 20
 DEFAULT_MAX_BUDGET_USD = 0.50
 
 
-async def run_treasure_hunt() -> None:
+async def run_treasure_hunt(interactive: bool = True) -> dict:
     """The agent loop, run by the Claude Agent SDK: it calls the model, runs
     whichever tool it picks against our in-memory World, feeds the result
     back, and repeats until the model decides the hunt is over — or until a
     guardrail (max turns / max budget) cuts it off first. A live dashboard
     shows the map, the agent's running commentary, and how much of the
-    subscription's rate-limit windows this run is using. If TRANSCRIPT_FILE
-    is set, the whole run is also saved as a replayable JSON transcript."""
+    subscription's rate-limit windows this run is using (unless
+    interactive=False, e.g. unattended evaluation runs). If TRANSCRIPT_FILE
+    is set, the whole run is also saved as a replayable JSON transcript.
+
+    Returns a summary dict: outcome, total_turns, total_cost_usd, and the
+    cumulative token/cache figures - for the evaluation harness to collect
+    across many runs without needing to re-read a saved transcript file."""
     max_turns = int(os.environ.get("MAX_TURNS", DEFAULT_MAX_TURNS))
     max_budget_usd = float(os.environ.get("MAX_BUDGET_USD", DEFAULT_MAX_BUDGET_USD))
 
-    dashboard = Dashboard(room_names=list(ROOMS.keys()), max_turns=max_turns, max_budget_usd=max_budget_usd)
+    dashboard = Dashboard(
+        room_names=list(ROOMS.keys()), max_turns=max_turns, max_budget_usd=max_budget_usd, interactive=interactive
+    )
     recorder = TranscriptRecorder(start_room="entrance", max_turns=max_turns, max_budget_usd=max_budget_usd, model=MODEL)
+    outcome = "unknown"
+    final_cost: float | None = None
 
     with dashboard:
         server, world = build_game_server(dashboard, recorder)
@@ -103,6 +112,8 @@ async def run_treasure_hunt() -> None:
                     dashboard.update_rate_limits(message.rate_limit_info.raw)
                     recorder.rate_limit(message.rate_limit_info.raw)
                 elif isinstance(message, ResultMessage):
+                    outcome = message.subtype
+                    final_cost = message.total_cost_usd
                     if message.subtype == "success":
                         dashboard.log(f"🏆 {message.result}")
                         recorder.result("success", message.result, message.total_cost_usd, dashboard.turns)
@@ -112,6 +123,8 @@ async def run_treasure_hunt() -> None:
         except ResultError as e:
             spent = e.data.get("total_cost_usd")
             spent_str = f"${spent:.4f}" if isinstance(spent, (int, float)) else "unknown"
+            outcome = e.subtype or "error"
+            final_cost = spent
             if e.subtype == "error_max_turns":
                 dashboard.log(f"🛑 Guardrail hit: reached the {max_turns}-turn limit before finding the treasure.")
             elif e.subtype == "error_max_budget_usd":
@@ -126,6 +139,16 @@ async def run_treasure_hunt() -> None:
     transcript_file = os.environ.get("TRANSCRIPT_FILE")
     if transcript_file:
         recorder.save(transcript_file)
+
+    return {
+        "outcome": outcome,
+        "total_turns": dashboard.turns,
+        "total_cost_usd": final_cost,
+        "input_tokens": dashboard.tokens["input"],
+        "output_tokens": dashboard.tokens["output"],
+        "cache_read_input_tokens": dashboard.tokens["cache_read"],
+        "cache_creation_input_tokens": dashboard.tokens["cache_creation"],
+    }
 
 
 def main() -> None:

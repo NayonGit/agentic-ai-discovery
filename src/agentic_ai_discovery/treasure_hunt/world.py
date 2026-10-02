@@ -13,7 +13,7 @@ ROOMS = {
     },
     "courtyard": {
         "description": "An overgrown courtyard. A dry fountain sits at its center.",
-        "exits": {"south": "entrance", "north": "tower", "east": "garden"},
+        "exits": {"south": "entrance", "north": "tower", "east": "garden", "west": "library", "down": "cellar"},
         "item": "a torn map fragment",
         "item_description": (
             "You found a torn map fragment. A faded note scrawled on it reads: "
@@ -34,6 +34,26 @@ ROOMS = {
         "description": "A dusty attic, moonlight slipping through a cracked roof.",
         "exits": {"down": "tower"},
         "item": "the treasure chest",
+    },
+    "library": {
+        "description": "Shelves of swollen, water-damaged books line the walls. Dust hangs in the air.",
+        "exits": {"east": "courtyard", "north": "archive"},
+        "item": "a dusty scroll",
+    },
+    "archive": {
+        "description": "A cramped records room, cabinets rusted shut. One drawer hangs open.",
+        "exits": {"south": "library"},
+        "item": "a sealed envelope",
+    },
+    "cellar": {
+        "description": "A cool stone cellar, empty wine racks collapsed against one wall.",
+        "exits": {"up": "courtyard", "down": "crypt"},
+        "item": None,
+    },
+    "crypt": {
+        "description": "A small crypt, the air thick with dust. A single stone coffin lies undisturbed.",
+        "exits": {"up": "cellar"},
+        "item": "a tarnished medallion",
     },
 }
 

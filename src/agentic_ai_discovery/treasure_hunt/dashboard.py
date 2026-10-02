@@ -22,7 +22,9 @@ class Dashboard:
     """Live terminal view of the hunt: where the agent is, what it's doing,
     and how much of your Claude subscription that's using up."""
 
-    def __init__(self, room_names: list[str], max_turns: int, max_budget_usd: float) -> None:
+    def __init__(
+        self, room_names: list[str], max_turns: int, max_budget_usd: float, interactive: bool = True
+    ) -> None:
         self.room_names = room_names
         self.current_room = room_names[0]
         self.visited = {room_names[0]}
@@ -34,16 +36,19 @@ class Dashboard:
         self.max_turns = max_turns
         self.max_budget_usd = max_budget_usd
         self.rate_limits: dict[str, dict] = {}
+        self.interactive = interactive
 
         self._console = Console()
-        self._live = Live(self._render(), console=self._console, refresh_per_second=8)
+        self._live = Live(self._render(), console=self._console, refresh_per_second=8) if interactive else None
 
     def __enter__(self) -> "Dashboard":
-        self._live.__enter__()
+        if self._live is not None:
+            self._live.__enter__()
         return self
 
     def __exit__(self, *exc_info) -> None:
-        self._live.__exit__(*exc_info)
+        if self._live is not None:
+            self._live.__exit__(*exc_info)
 
     def set_room(self, name: str, description: str, exits: list[str]) -> None:
         self.current_room = name
@@ -59,7 +64,10 @@ class Dashboard:
 
     async def wait_for_step(self, prompt: str = "— press Enter for the next step —") -> None:
         """Pause the live view and block until the user presses Enter, so a
-        human has time to read each step instead of the agent racing ahead."""
+        human has time to read each step instead of the agent racing ahead.
+        No-op when not interactive (e.g. unattended evaluation runs)."""
+        if not self.interactive:
+            return
         self._live.stop()
         try:
             await asyncio.to_thread(input, prompt)
@@ -69,7 +77,10 @@ class Dashboard:
     async def ask_approval(self, prompt: str) -> bool:
         """Pause the live view and ask a real yes/no question. Blank input
         (e.g. non-interactive testing) defaults to deny - the safe default
-        for an approval gate."""
+        for an approval gate. When not interactive at all (no human present,
+        e.g. evaluation runs), denies immediately without touching stdin."""
+        if not self.interactive:
+            return False
         self._live.stop()
         try:
             answer = await asyncio.to_thread(input, prompt)
@@ -93,7 +104,8 @@ class Dashboard:
         self._refresh()
 
     def _refresh(self) -> None:
-        self._live.update(self._render())
+        if self._live is not None:
+            self._live.update(self._render())
 
     def _render(self) -> Layout:
         layout = Layout()
