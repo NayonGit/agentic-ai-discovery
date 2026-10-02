@@ -1076,30 +1076,43 @@
   }
 
   const edgeEls = {};
-  EDGES.forEach(([a, b], i) => {
-    const pa = ROOM_POS[a], pb = ROOM_POS[b];
-    const path = node('path', { class: 'edge', d: roughPath(pa.x, pa.y, pb.x, pb.y, i * 1.7) });
-    svg.appendChild(path);
-    edgeEls[`${a}|${b}`] = path;
-    edgeEls[`${b}|${a}`] = path;
-  });
-
   const roomEls = {};
-  for (const name in ROOM_POS) {
-    const p = ROOM_POS[name];
-    const g = node('g', { class: 'room-node', 'data-room': name, transform: `translate(${p.x},${p.y})` });
-    g.appendChild(node('circle', { class: 'ring', r: 15 }));
-    const glyph = node('path', { class: 'glyph', d: GLYPHS[p.glyph], 'stroke-width': 1.3 });
-    g.appendChild(glyph);
-    const label = node('text', { x: 0, y: 26, 'text-anchor': 'middle' });
-    label.textContent = name;
-    g.appendChild(label);
-    svg.appendChild(g);
-    roomEls[name] = g;
+  const marker = node('circle', { class: 'marker', r: 4 });
+
+  // Rebuilt per-transcript so each chapter's map only shows the rooms that
+  // actually existed in its recording, not the full modern 9-room estate.
+  function buildMap(roomNames) {
+    svg.innerHTML = '';
+    for (const k in edgeEls) delete edgeEls[k];
+    for (const k in roomEls) delete roomEls[k];
+
+    EDGES.forEach(([a, b], i) => {
+      if (!roomNames.includes(a) || !roomNames.includes(b)) return;
+      const pa = ROOM_POS[a], pb = ROOM_POS[b];
+      const path = node('path', { class: 'edge', d: roughPath(pa.x, pa.y, pb.x, pb.y, i * 1.7) });
+      svg.appendChild(path);
+      edgeEls[`${a}|${b}`] = path;
+      edgeEls[`${b}|${a}`] = path;
+    });
+
+    roomNames.forEach((name) => {
+      const p = ROOM_POS[name];
+      if (!p) return;
+      const g = node('g', { class: 'room-node', 'data-room': name, transform: `translate(${p.x},${p.y})` });
+      g.appendChild(node('circle', { class: 'ring', r: 15 }));
+      const glyph = node('path', { class: 'glyph', d: GLYPHS[p.glyph], 'stroke-width': 1.3 });
+      g.appendChild(glyph);
+      const label = node('text', { x: 0, y: 26, 'text-anchor': 'middle' });
+      label.textContent = name;
+      g.appendChild(label);
+      svg.appendChild(g);
+      roomEls[name] = g;
+    });
+
+    svg.appendChild(marker);
   }
 
-  const marker = node('circle', { class: 'marker', r: 4 });
-  svg.appendChild(marker);
+  buildMap(Object.keys(ROOM_POS));
 
   // ---------- state ----------
 
@@ -1306,6 +1319,7 @@
           ? `cap: ${data.max_turns} turns · $${data.max_budget_usd.toFixed(2)}`
           : 'no guardrail cap yet';
         headerMeta.innerHTML = `${data.model}<br>${capText}`;
+        buildMap(Object.keys(data.rooms));
         resetVisualState();
         updateTransportUI();
       })
