@@ -181,3 +181,32 @@ so Chapter 1 shows the bare agent loop with no guardrails/ladder-fail/lock at
 all, Chapter 3 shows the ladder-fail without the tower lock existing yet, and
 so on — not whatever the fully-loaded current map happens to do. Full writeup
 in `NOTES.md`.
+
+### Context management & compaction
+
+Added a `PreCompact` hook to observe the Agent SDK's own auto-compaction
+(the same mechanism behind Claude Code's `/compact`) firing, and a way to
+force it via the CLI's `--autocompact <tokens>` flag:
+
+```bash
+AUTOCOMPACT=150000 uv run treasure-hunt   # force a low compaction threshold
+```
+
+On this map, context plateaus almost immediately (~123k tokens — the fixed
+system prompt + 4 tool schemas) and grows only ~200–300 tokens/turn after
+that: across 5 default trials, auto-compaction never fired once. The task
+is simply too small to need it yet. Forcing a low threshold (100k–150k)
+didn't degrade gracefully either — it made the SDK's own auto-compact
+**thrash** (repeatedly compact, immediately exceed the threshold again, then
+abort with its own diagnostic, *"Autocompact is thrashing..."*), every time
+it was tried in that range; 180k simply never triggered.
+
+That thrashing exposed a real measurement bug: the SDK's
+`outcome == "success"` only means the session ended without tripping a
+guardrail, **not** that the agent actually won — a thrashing session
+reported success too, having never found the treasure. Every success-rate
+figure (here and in every earlier stone) now checks the real game state
+(`treasure_found`) instead of trusting that label — fixed in the harness,
+the recorder, and the visualizer, which had the identical flaw. Full
+writeup, including why this doesn't appear to have affected earlier stones'
+reported numbers, in `NOTES.md`.
