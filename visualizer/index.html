@@ -135,6 +135,173 @@
   .recording-picker select:hover { border-color: var(--accent); }
   .recording-picker select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
+  .view-toggle {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .view-btn {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: transparent;
+    color: var(--ink-faint);
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .view-btn:hover { color: var(--ink); border-color: var(--accent); }
+  .view-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .view-btn.active { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+
+  #replay-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  /* ---------- evaluation view ---------- */
+
+  .eval-view {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.4rem 2rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+  }
+
+  .eval-view h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.4rem;
+    margin: 0;
+  }
+
+  .stat-tiles {
+    display: flex;
+    gap: 1.1rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    background: var(--ground-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.7rem 1.1rem;
+    min-width: 150px;
+  }
+
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-faint);
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.35rem;
+    color: var(--ink);
+  }
+
+  .eval-chart-wrap { max-width: 620px; }
+  #eval-chart { width: 100%; height: auto; display: block; }
+
+  .eval-bar-label {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 10px;
+    fill: var(--ink-dim);
+  }
+
+  .eval-axis-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--ink-faint);
+  }
+
+  .eval-threshold-line {
+    stroke: var(--ink-faint);
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+  }
+
+  .eval-threshold-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    fill: var(--ink-faint);
+  }
+
+  .eval-legend {
+    display: flex;
+    gap: 1.4rem;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-dim);
+  }
+
+  .legend-swatch {
+    width: 11px;
+    height: 11px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  .legend-swatch.success { background: var(--accent); }
+  .legend-swatch.fail { background: var(--rust); }
+
+  .eval-caption {
+    max-width: 68ch;
+    font-size: 0.92rem;
+    color: var(--ink-dim);
+    line-height: 1.55;
+  }
+
+  .eval-table-wrap { overflow-x: auto; max-width: 620px; }
+
+  .eval-table {
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eval-table th, .eval-table td {
+    text-align: left;
+    padding: 0.35rem 0.9rem 0.35rem 0;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  .eval-table th {
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  .eval-table td.outcome-fail { color: var(--rust); }
+  .eval-table td.outcome-success { color: var(--accent); }
+
   /* ---------- main layout ---------- */
 
   main {
@@ -417,17 +584,22 @@
 
 <header>
   <h1>The Estate <em>Expedition</em></h1>
-  <div class="recording-picker">
+  <div class="view-toggle">
+    <button id="view-replay-btn" class="view-btn active" type="button">Replay</button>
+    <button id="view-eval-btn" class="view-btn" type="button">Evaluation</button>
+  </div>
+  <div class="recording-picker" id="recording-picker">
     <label for="recording-select">Recording</label>
     <select id="recording-select"></select>
   </div>
   <div class="header-meta" id="header-meta">loading transcript…</div>
 </header>
 
+<div id="replay-view">
 <main>
   <section class="map-pane">
     <h2>Grounds &amp; chambers</h2>
-    <svg id="map-svg" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid meet" aria-label="Map of the estate"></svg>
+    <svg id="map-svg" viewBox="0 0 340 460" preserveAspectRatio="xMidYMid meet" aria-label="Map of the estate"></svg>
     <div class="room-caption" id="room-caption">&nbsp;</div>
   </section>
 
@@ -473,6 +645,43 @@
     <span class="step-count" id="step-count">0 / 0</span>
   </div>
 </footer>
+</div><!-- /replay-view -->
+
+<section id="eval-view" class="eval-view" hidden>
+  <h2>5-trial baseline — the scaled estate</h2>
+  <div class="stat-tiles">
+    <div class="stat-tile">
+      <span class="stat-label">Success rate</span>
+      <span class="stat-value" id="eval-success-rate">—</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-label">Mean cost</span>
+      <span class="stat-value" id="eval-mean-cost">—</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-label">Mean turns</span>
+      <span class="stat-value" id="eval-mean-turns">—</span>
+    </div>
+    <div class="stat-tile">
+      <span class="stat-label">Mean cache-read tokens</span>
+      <span class="stat-value" id="eval-mean-cache">—</span>
+    </div>
+  </div>
+  <div class="eval-chart-wrap">
+    <svg id="eval-chart" viewBox="0 0 560 320" preserveAspectRatio="xMidYMid meet" aria-label="Cost per trial across five baseline runs"></svg>
+  </div>
+  <div class="eval-legend">
+    <span class="legend-item"><span class="legend-swatch success"></span>Succeeded</span>
+    <span class="legend-item"><span class="legend-swatch fail"></span>Hit the budget guardrail</span>
+  </div>
+  <p class="eval-caption">Five trials of the single-agent hunt on the scaled map (two new wings added off the
+    courtyard). The default $0.50 budget cap — comfortably generous on the original 5-room map, where a typical
+    run cost $0.04–$0.07 — is now barely sufficient: every successful run lands within a few cents of it, and
+    one run in five fails the guardrail outright.</p>
+  <div class="eval-table-wrap">
+    <table class="eval-table" id="eval-table"></table>
+  </div>
+</section>
 
 <script>
 (() => {
@@ -482,14 +691,20 @@
     { file: 'tool-failure-recovery.json', label: 'Tool failure & recovery' },
     { file: 'planning-dependencies.json', label: 'Planning & dependencies' },
     { file: 'prompt-injection.json', label: 'Untrusted output & prompt injection' },
+    { file: 'approval-gates.json', label: 'Approval gates for risky actions' },
+    { file: 'scaled-map.json', label: 'Scaling — the larger estate' },
   ];
 
   const ROOM_POS = {
-    attic:     { x: 150, y: 46,  glyph: 'chest' },
-    tower:     { x: 150, y: 150, glyph: 'tower' },
-    courtyard: { x: 150, y: 254, glyph: 'fountain' },
-    garden:    { x: 232, y: 254, glyph: 'leaf' },
-    entrance:  { x: 150, y: 358, glyph: 'gate' },
+    attic:     { x: 170, y: 40,  glyph: 'chest' },
+    tower:     { x: 170, y: 140, glyph: 'tower' },
+    courtyard: { x: 170, y: 240, glyph: 'fountain' },
+    garden:    { x: 260, y: 240, glyph: 'leaf' },
+    entrance:  { x: 170, y: 340, glyph: 'gate' },
+    library:   { x: 80,  y: 240, glyph: 'book' },
+    archive:   { x: 80,  y: 140, glyph: 'cabinet' },
+    cellar:    { x: 260, y: 340, glyph: 'barrel' },
+    crypt:     { x: 260, y: 420, glyph: 'coffin' },
   };
 
   const EDGES = [
@@ -498,6 +713,10 @@
     ['tower', 'attic'],
     ['courtyard', 'garden'],
     ['garden', 'tower'],
+    ['courtyard', 'library'],
+    ['library', 'archive'],
+    ['courtyard', 'cellar'],
+    ['cellar', 'crypt'],
   ];
 
   const GLYPHS = {
@@ -506,6 +725,10 @@
     leaf: 'M 0 -6 Q 6 -2 0 6 Q -6 -2 0 -6 M 0 -6 L 0 6',
     tower: 'M -4 5 L -4 -5 L 4 -5 L 4 5 M -4 -5 L -4 -8 M 4 -5 L 4 -8 M -6 -8 L 6 -8',
     chest: 'M -6 2 L 6 2 L 6 6 L -6 6 Z M -6 2 Q -6 -4 0 -4 Q 6 -4 6 2 M -2 4 L 2 4',
+    book: 'M -6 5 L -6 -5 L -3 -5 L -3 5 M -1 5 L -1 -6 L 2 -6 L 2 5 M 4 5 L 4 -4 L 6 -4 L 6 5',
+    cabinet: 'M -6 -6 L 6 -6 L 6 6 L -6 6 Z M -6 0 L 6 0 M -2 -3 L 2 -3 M -2 3 L 2 3',
+    barrel: 'M -4 -6 Q -6 -6 -6 -3 L -6 3 Q -6 6 -4 6 L 4 6 Q 6 6 6 3 L 6 -3 Q 6 -6 4 -6 Z M -6 -2 L 6 -2 M -6 2 L 6 2',
+    coffin: 'M -3 -6 L 3 -6 L 5 -2 L 5 4 L -5 4 L -5 -2 Z M 0 -6 L 0 4',
   };
 
   const svgNS = 'http://www.w3.org/2000/svg';
@@ -763,5 +986,133 @@
   recordingSelect.addEventListener('change', () => loadTranscript(recordingSelect.value));
 
   loadTranscript(recordingSelect.value || RECORDINGS[0].file);
+
+  // ---------- evaluation view ----------
+
+  const viewReplayBtn = document.getElementById('view-replay-btn');
+  const viewEvalBtn = document.getElementById('view-eval-btn');
+  const replayViewEl = document.getElementById('replay-view');
+  const evalViewEl = document.getElementById('eval-view');
+  const recordingPickerEl = document.getElementById('recording-picker');
+
+  let evalLoaded = false;
+
+  function showReplay() {
+    viewReplayBtn.classList.add('active');
+    viewEvalBtn.classList.remove('active');
+    replayViewEl.hidden = false;
+    evalViewEl.hidden = true;
+    recordingPickerEl.hidden = false;
+    headerMeta.hidden = false;
+  }
+
+  function showEval() {
+    stop();
+    viewEvalBtn.classList.add('active');
+    viewReplayBtn.classList.remove('active');
+    replayViewEl.hidden = true;
+    evalViewEl.hidden = false;
+    recordingPickerEl.hidden = true;
+    headerMeta.hidden = true;
+    loadEvalData();
+  }
+
+  viewReplayBtn.addEventListener('click', showReplay);
+  viewEvalBtn.addEventListener('click', showEval);
+
+  function fmtCompact(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return String(Math.round(n));
+  }
+
+  function renderEvalStats(data) {
+    const agg = data.aggregate;
+    document.getElementById('eval-success-rate').textContent = `${Math.round(agg.success_rate * 100)}%`;
+    document.getElementById('eval-mean-cost').textContent = agg.cost_usd ? `$${agg.cost_usd.mean.toFixed(4)}` : '—';
+    document.getElementById('eval-mean-turns').textContent = agg.turns.mean.toFixed(1);
+    document.getElementById('eval-mean-cache').textContent = fmtCompact(agg.cache_read_input_tokens.mean);
+  }
+
+  function renderEvalChart(data) {
+    const runs = data.runs;
+    const BUDGET_CAP = 0.5;
+    const W = 560, H = 320;
+    const padLeft = 50, padRight = 16, padTop = 24, padBottom = 50;
+    const plotW = W - padLeft - padRight;
+    const plotH = H - padTop - padBottom;
+
+    const maxCost = Math.max(...runs.map((r) => r.total_cost_usd || 0), BUDGET_CAP) * 1.15;
+    const gap = 20;
+    const barW = Math.min(46, (plotW - gap * (runs.length - 1)) / runs.length);
+    const usedW = barW * runs.length + gap * (runs.length - 1);
+    const startX = padLeft + (plotW - usedW) / 2;
+    const toY = (cost) => padTop + plotH * (1 - cost / maxCost);
+    const baseline = padTop + plotH;
+
+    const parts = [];
+    parts.push(`<line x1="${padLeft}" y1="${baseline}" x2="${padLeft + plotW}" y2="${baseline}" stroke="var(--line-strong)" stroke-width="1"/>`);
+
+    const capY = toY(BUDGET_CAP);
+    parts.push(`<line class="eval-threshold-line" x1="${padLeft}" y1="${capY}" x2="${padLeft + plotW}" y2="${capY}"/>`);
+    parts.push(`<text class="eval-threshold-label" x="${padLeft + plotW}" y="${capY - 5}" text-anchor="end">$${BUDGET_CAP.toFixed(2)} budget cap</text>`);
+
+    runs.forEach((r, i) => {
+      const x = startX + i * (barW + gap);
+      const cost = r.total_cost_usd || 0;
+      const barY = toY(cost);
+      const barH = Math.max(baseline - barY, 1);
+      const failed = r.outcome !== 'success';
+      const color = failed ? 'var(--rust)' : 'var(--accent)';
+      const title = `Trial ${i + 1}: ${r.outcome}, ${r.total_turns} turns, $${cost.toFixed(4)}`;
+      parts.push(
+        `<rect x="${x}" y="${barY}" width="${barW}" height="${barH}" rx="4" fill="${color}"><title>${title}</title></rect>`
+      );
+      parts.push(`<text class="eval-bar-label" x="${x + barW / 2}" y="${barY - 8}" text-anchor="middle">$${cost.toFixed(2)}</text>`);
+      parts.push(`<text class="eval-axis-label" x="${x + barW / 2}" y="${baseline + 16}" text-anchor="middle">Trial ${i + 1}</text>`);
+      parts.push(`<text class="eval-axis-label" x="${x + barW / 2}" y="${baseline + 30}" text-anchor="middle">${r.total_turns} turns</text>`);
+    });
+
+    const svg = document.getElementById('eval-chart');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    svg.innerHTML = parts.join('');
+  }
+
+  function renderEvalTable(data) {
+    const rows = data.runs
+      .map(
+        (r, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td class="${r.outcome === 'success' ? 'outcome-success' : 'outcome-fail'}">${r.outcome}</td>
+        <td>${r.total_turns}</td>
+        <td>${r.total_cost_usd !== null ? '$' + r.total_cost_usd.toFixed(4) : '—'}</td>
+        <td>${r.cache_read_input_tokens.toLocaleString('en-US')}</td>
+      </tr>`
+      )
+      .join('');
+    document.getElementById('eval-table').innerHTML = `
+      <thead><tr><th>Trial</th><th>Outcome</th><th>Turns</th><th>Cost</th><th>Cache read</th></tr></thead>
+      <tbody>${rows}</tbody>`;
+  }
+
+  function loadEvalData() {
+    if (evalLoaded) return;
+    evalLoaded = true;
+    fetch('eval-baseline.json')
+      .then((r) => r.json())
+      .then((data) => {
+        renderEvalStats(data);
+        renderEvalChart(data);
+        renderEvalTable(data);
+      })
+      .catch((err) => {
+        document.getElementById('eval-view').insertAdjacentHTML(
+          'afterbegin',
+          '<p class="entry-empty">Failed to load evaluation data.</p>'
+        );
+        console.error(err);
+      });
+  }
 })();
 </script>

@@ -161,3 +161,8 @@ turns — the default caps, comfortable on the old 5-room map, are now
 barely sufficient. Full writeup, including a caching scare that turned
 out to be a one-off transient blip (reproduced healthy on retry), in
 `NOTES.md`.
+
+The [visualizer](#replay-visualizer) now has an **Evaluation** tab
+alongside Replay, charting cost per trial against the budget cap
+(colored by outcome) plus a stat-tile summary and a full data table —
+and the map in the replay view includes the two new wings.
