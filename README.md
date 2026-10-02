@@ -140,3 +140,44 @@ silently broke prompt caching entirely (same failure signature as the
 `effort="low"` regression above) — switching to a `PreToolUse` hook fixed
 it while leaving `permission_mode="bypassPermissions"` intact for every
 other tool. Full writeup in `NOTES.md`.
+
+### Scaling the map + an evaluation harness
+
+Added two new wings off the courtyard (`library → archive`, `cellar →
+crypt`) and a real evaluation harness instead of relying on single
+anecdotal runs:
+
+```bash
+uv run treasure-hunt-eval                        # 5 trials by default
+EVAL_TRIALS=3 uv run treasure-hunt-eval           # override trial count
+```
+
+Runs the existing single-agent game `EVAL_TRIALS` times unattended
+(`Dashboard(interactive=False)` — no live rendering, no blocking prompts)
+and saves per-trial + aggregate stats to `transcripts/eval/`. The first
+5-trial baseline on the scaled map: 4/5 succeeded at $0.44–$0.48 each,
+and the 5th **failed the $0.50 budget guardrail outright** at just 7
+turns — the default caps, comfortable on the old 5-room map, are now
+barely sufficient. Full writeup, including a caching scare that turned
+out to be a one-off transient blip (reproduced healthy on retry), in
+`NOTES.md`.
+
+The [visualizer](#replay-visualizer) now has an **Evaluation** tab
+alongside Replay, charting cost per trial against the budget cap
+(colored by outcome) plus a stat-tile summary and a full data table —
+and the map in the replay view includes the two new wings.
+
+The visualizer was then restructured around a **Field Guide**: one
+chapter per concept above, each with a real definition, what was
+built, what was learned, and a button that jumps straight into the
+replayer at the matching recording. Replay and Evaluation are still
+there as their own tabs — the guide is the new default landing view,
+and the Evaluation tab now opens with an explicit "what these metrics
+mean and why" key instead of an unexplained chart.
+
+Each chapter's recording is now version-correct: regenerated from the actual
+historical commit for that stone (via an isolated `git worktree` per branch),
+so Chapter 1 shows the bare agent loop with no guardrails/ladder-fail/lock at
+all, Chapter 3 shows the ladder-fail without the tower lock existing yet, and
+so on — not whatever the fully-loaded current map happens to do. Full writeup
+in `NOTES.md`.
