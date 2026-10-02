@@ -302,6 +302,175 @@
   .eval-table td.outcome-fail { color: var(--rust); }
   .eval-table td.outcome-success { color: var(--accent); }
 
+  .metrics-key {
+    background: var(--ground-raised);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    max-width: 68ch;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .metrics-key p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--ink-dim);
+    line-height: 1.55;
+  }
+
+  .metrics-caveat {
+    font-style: italic;
+    color: var(--ink-faint) !important;
+    font-size: 0.84rem !important;
+  }
+
+  /* ---------- field guide (course) view ---------- */
+
+  .guide-view {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1.6rem 2.2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    max-width: 760px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .guide-intro {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink-dim);
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .chapter {
+    border-top: 1px solid var(--line);
+    padding-top: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .chapter-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+  }
+
+  .chapter-num {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+  }
+
+  .chapter h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .chapter p {
+    margin: 0;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .chapter code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--ground-sunken);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+
+  .chapter-learned {
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border-left: 3px solid var(--accent);
+    padding: 0.7rem 0.9rem;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .chapter-caveat {
+    background: color-mix(in srgb, var(--rust) 8%, transparent);
+    border-left: 3px solid var(--rust);
+    padding: 0.7rem 0.9rem;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.92rem !important;
+  }
+
+  .metric-list {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .metric-list li {
+    font-size: 0.96rem;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .watch-btn, .watch-eval-btn {
+    align-self: flex-start;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    margin-top: 0.3rem;
+    margin-right: 0.6rem;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .watch-btn:hover, .watch-eval-btn:hover { background: var(--accent); color: var(--accent-ink); }
+  .watch-btn:focus-visible, .watch-eval-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .chapter-upcoming {
+    border-top: 1px dashed var(--line-strong);
+    padding-top: 1.4rem;
+    color: var(--ink-faint);
+  }
+
+  .chapter-upcoming h3 {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 0.7rem;
+    font-weight: 500;
+  }
+
+  .chapter-upcoming ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chapter-upcoming li {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .chapter-upcoming strong { color: var(--ink-dim); }
+
   /* ---------- main layout ---------- */
 
   main {
@@ -585,17 +754,167 @@
 <header>
   <h1>The Estate <em>Expedition</em></h1>
   <div class="view-toggle">
-    <button id="view-replay-btn" class="view-btn active" type="button">Replay</button>
+    <button id="view-guide-btn" class="view-btn active" type="button">Field Guide</button>
+    <button id="view-replay-btn" class="view-btn" type="button">Replay</button>
     <button id="view-eval-btn" class="view-btn" type="button">Evaluation</button>
   </div>
-  <div class="recording-picker" id="recording-picker">
+  <div class="recording-picker" id="recording-picker" hidden>
     <label for="recording-select">Recording</label>
     <select id="recording-select"></select>
   </div>
-  <div class="header-meta" id="header-meta">loading transcript…</div>
+  <div class="header-meta" id="header-meta" hidden>loading transcript…</div>
 </header>
 
-<div id="replay-view">
+<section id="guide-view" class="guide-view">
+  <p class="guide-intro">A chapter per concept this project taught, each paired with a real recorded run —
+    not a hypothetical. Read the definition, then watch it actually happen.</p>
+
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">01</span>
+      <h2>Workflows vs. agents, and the agent loop</h2>
+    </div>
+    <p><strong>Definition.</strong> A <em>workflow</em> is a system where code decides the sequence of steps.
+      An <em>agent</em> is a system where the model itself decides the next step and which tool to use,
+      based on what it discovers, looping until it judges the task done.</p>
+    <p>The whole treasure hunt is an agent loop: Claude exploring a small estate with three tools
+      (<code>look_around</code>, <code>move</code>, <code>search_room</code>), deciding its own path
+      turn by turn — nothing in the code chose the order of actions, only the rules of the world.</p>
+    <p class="chapter-learned"><strong>Why it matters:</strong> agents cost more and are less predictable
+      than workflows — every turn resends the whole growing history, and the exact path varies run to
+      run. A real system starts with the simplest option that works, not "agent" by default.</p>
+    <button class="watch-btn" data-recording="showcase.json">▶ Watch: a full hunt</button>
+  </article>
+
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">02</span>
+      <h2>Guardrails: bounding an agent's cost</h2>
+    </div>
+    <p><strong>Definition.</strong> Hard caps — a maximum number of turns, a maximum budget — that stop
+      the loop regardless of what the model itself decides, because "the model will know when to stop"
+      is a soft guarantee, not a hard one.</p>
+    <p>Built as native Agent SDK options (<code>max_turns</code>, <code>max_budget_usd</code>) rather than
+      a hand-rolled counter — the SDK stops the loop itself and reports why.</p>
+    <p class="chapter-learned"><strong>What we learned:</strong> the default caps almost never trip on
+      their own — you have to deliberately force them low to actually <em>see</em> the mechanism fire.
+      "I implemented it" and "I've seen it work" are different claims, worth verifying separately.</p>
+    <button class="watch-btn" data-recording="guardrails.json">▶ Watch: a turn cap trip</button>
+  </article>
+
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">03</span>
+      <h2>Tool failure &amp; recovery</h2>
+    </div>
+    <p><strong>Definition.</strong> Real tools fail — timeouts, flaky dependencies, transient errors. A
+      resilient agent needs to notice a failed result (<code>is_error: true</code>) and decide whether
+      retrying is worth it.</p>
+    <p>The tower's ladder fails deterministically on the first attempt, then always succeeds after — with
+      no hint anywhere that this would happen, so whatever the agent did next was a genuine judgment call.</p>
+    <p class="chapter-learned"><strong>What we learned:</strong> the exact <em>wording</em> of the failure
+      message controlled the agent's behavior completely. An ambiguous failure ("you slip back down") led
+      it to abandon the path and explore the entire rest of the map before trying again. An explicit retry
+      hint ("worth trying again") led it to retry on the very next action. The error message is a design
+      surface, not an afterthought.</p>
+    <button class="watch-btn" data-recording="tool-failure-recovery.json">▶ Watch: the ladder fail, then recover</button>
+  </article>
+
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">04</span>
+      <h2>Planning &amp; multi-step dependencies</h2>
+    </div>
+    <p><strong>Definition.</strong> Some goals require satisfying a prerequisite first — a locked door
+      that needs a key found somewhere else. Can the agent recognize a blocker and go solve it, instead
+      of only reacting to what's directly in front of it?</p>
+    <p>The tower is locked unless the rusty key (sitting in a side room) is already in the inventory —
+      a real precondition, not a one-shot failure.</p>
+    <p class="chapter-learned"><strong>What we learned:</strong> across repeated runs the agent handled it
+      correctly either way — sometimes gathering the key proactively before ever trying the door,
+      sometimes getting blocked first and correctly backtracking for it. Both are valid outcomes; a
+      single run isn't enough to tell you which capability you actually tested.</p>
+    <button class="watch-btn" data-recording="tool-failure-recovery.json">▶ Watch: blocked, then backtracking for the key</button>
+  </article>
+
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">05</span>
+      <h2>Untrusted tool output &amp; prompt injection</h2>
+    </div>
+    <p><strong>Definition.</strong> Any tool that returns content from outside your control — a web page,
+      a file, a user submission — can carry someone else's instructions riding along inside it. The agent
+      has to treat tool results as <em>data</em>, never as commands.</p>
+    <p>A planted note, found via search, impersonates a system message asking the agent to leak its
+      configuration and stop working — modeled on a real attack goal, not a hypothetical.</p>
+    <p class="chapter-learned"><strong>What we learned:</strong> the agent caught it immediately and
+      explicitly, named it as an injection attempt in the game content, and kept working — genuinely
+      reassuring. The honest caveat: this was a blatant, self-announcing attempt. One clean result is
+      evidence the defense <em>can</em> work, not proof it always will.</p>
+    <button class="watch-btn" data-recording="prompt-injection.json">▶ Watch: the agent catch the injection</button>
+  </article>
+
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">06</span>
+      <h2>Approval gates for risky actions</h2>
+    </div>
+    <p><strong>Definition.</strong> Some actions are consequential enough — deleting data, spending money,
+      sending a message — that they should require a real human's sign-off before executing, regardless
+      of how aligned the model seems.</p>
+    <p><code>force_door</code> is an irreversible shortcut past the lock, gated by the Agent SDK's actual
+      permission system (a <code>PreToolUse</code> hook) — not a simulated prompt.</p>
+    <p class="chapter-learned"><strong>What we learned:</strong> across three runs, the agent never once
+      chose the risky shortcut when the safe path was available — reassuring, but it also means the gate
+      may rarely fire <em>because</em> good tool descriptions already discourage the risky choice. The
+      gate still has to exist and actually work; avoidance is a tendency, not a guarantee.</p>
+    <button class="watch-btn" data-recording="approval-gates.json">▶ Watch: the approval gate wired up</button>
+  </article>
+
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">07</span>
+      <h2>Scaling, and what we actually measure</h2>
+    </div>
+    <p><strong>Definition.</strong> As a task grows, assumptions calibrated for the smaller version
+      quietly stop holding. The only way to know whether something changed for the better (or worse) is
+      to measure it across repeated runs — not read one transcript and guess.</p>
+    <p><strong>The metrics, and why each one:</strong></p>
+    <ul class="metric-list">
+      <li><strong>Success rate</strong> — did it finish the task at all? The most basic reliability
+        question; a cheap agent that fails half the time isn't actually useful.</li>
+      <li><strong>Cost</strong> — the literal dollar question this whole project set out to explore.</li>
+      <li><strong>Turns</strong> — a proxy for efficiency: more turns usually means more wall-clock time
+        and more chances for something to go wrong.</li>
+      <li><strong>Cache-read tokens</strong> — a diagnostic, not a goal: explains <em>why</em> cost
+        behaves the way it does, not whether the agent did well.</li>
+    </ul>
+    <p class="chapter-caveat"><strong>Honest caveat:</strong> these are the metrics that were already being
+      tracked by the dashboard, not ones deliberately chosen in advance for what "good" means on this
+      task. A fuller evaluation would also define a task-quality metric (did it take an efficient path,
+      not just finish?) and a safety metric (did it ever violate a boundary?) before calling any result
+      "better" than another.</p>
+    <p class="chapter-learned"><strong>What we found:</strong> on the scaled map, 4 of 5 runs cost
+      $0.44–$0.48 — right against the old $0.50 budget cap — and the 5th failed it outright. The cap
+      didn't get worse; the task outgrew what it was calibrated for.</p>
+    <button class="watch-btn" data-recording="scaled-map.json">▶ Watch: exploring the larger estate</button>
+    <button class="watch-eval-btn">📊 See the full evaluation chart</button>
+  </article>
+
+  <div class="chapter-upcoming">
+    <h3>Coming next in this course</h3>
+    <ul>
+      <li><strong>Context management &amp; compaction</strong> — the fix for the cache-growth problem
+        above, measured with this same harness.</li>
+      <li><strong>SDK-native subagents</strong> — once a single agent genuinely isn't enough, even with
+        compaction.</li>
+      <li><strong>Randomized map generation</strong> — makes persistent memory across runs actually
+        meaningful, instead of just memorizing one fixed layout.</li>
+    </ul>
+  </div>
+</section>
+
+<div id="replay-view" hidden>
 <main>
   <section class="map-pane">
     <h2>Grounds &amp; chambers</h2>
@@ -649,6 +968,15 @@
 
 <section id="eval-view" class="eval-view" hidden>
   <h2>5-trial baseline — the scaled estate</h2>
+  <div class="metrics-key">
+    <p><strong>What these measure, and why:</strong> success rate (did it finish at all — the basic
+      reliability question), cost (the dollar question this project set out to explore), turns (a proxy
+      for efficiency — more turns, more time, more chances to go wrong), and cache-read tokens (a
+      diagnostic for <em>why</em> cost behaves this way, not a goal in itself).</p>
+    <p class="metrics-caveat">These are the metrics already being tracked by the dashboard, not ones
+      deliberately chosen in advance for what "good" means on this task — see Chapter 07 in the Field
+      Guide for the fuller caveat on what a more complete evaluation would also track.</p>
+  </div>
   <div class="stat-tiles">
     <div class="stat-tile">
       <span class="stat-label">Success rate</span>
@@ -987,38 +1315,53 @@
 
   loadTranscript(recordingSelect.value || RECORDINGS[0].file);
 
-  // ---------- evaluation view ----------
+  // ---------- view switching (field guide / replay / evaluation) ----------
 
+  const viewGuideBtn = document.getElementById('view-guide-btn');
   const viewReplayBtn = document.getElementById('view-replay-btn');
   const viewEvalBtn = document.getElementById('view-eval-btn');
+  const guideViewEl = document.getElementById('guide-view');
   const replayViewEl = document.getElementById('replay-view');
   const evalViewEl = document.getElementById('eval-view');
   const recordingPickerEl = document.getElementById('recording-picker');
 
   let evalLoaded = false;
 
-  function showReplay() {
-    viewReplayBtn.classList.add('active');
-    viewEvalBtn.classList.remove('active');
-    replayViewEl.hidden = false;
-    evalViewEl.hidden = true;
-    recordingPickerEl.hidden = false;
-    headerMeta.hidden = false;
+  function setActiveView(name) {
+    viewGuideBtn.classList.toggle('active', name === 'guide');
+    viewReplayBtn.classList.toggle('active', name === 'replay');
+    viewEvalBtn.classList.toggle('active', name === 'eval');
+    guideViewEl.hidden = name !== 'guide';
+    replayViewEl.hidden = name !== 'replay';
+    evalViewEl.hidden = name !== 'eval';
+    recordingPickerEl.hidden = name !== 'replay';
+    headerMeta.hidden = name !== 'replay';
+    if (name !== 'replay') stop();
   }
 
+  function showGuide() { setActiveView('guide'); }
+  function showReplay() { setActiveView('replay'); }
   function showEval() {
-    stop();
-    viewEvalBtn.classList.add('active');
-    viewReplayBtn.classList.remove('active');
-    replayViewEl.hidden = true;
-    evalViewEl.hidden = false;
-    recordingPickerEl.hidden = true;
-    headerMeta.hidden = true;
+    setActiveView('eval');
     loadEvalData();
   }
 
+  viewGuideBtn.addEventListener('click', showGuide);
   viewReplayBtn.addEventListener('click', showReplay);
   viewEvalBtn.addEventListener('click', showEval);
+
+  document.querySelectorAll('.watch-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const file = btn.dataset.recording;
+      showReplay();
+      recordingSelect.value = file;
+      loadTranscript(file);
+    });
+  });
+
+  document.querySelectorAll('.watch-eval-btn').forEach((btn) => {
+    btn.addEventListener('click', showEval);
+  });
 
   function fmtCompact(n) {
     if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';

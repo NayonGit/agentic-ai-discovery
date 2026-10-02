@@ -166,3 +166,11 @@ The [visualizer](#replay-visualizer) now has an **Evaluation** tab
 alongside Replay, charting cost per trial against the budget cap
 (colored by outcome) plus a stat-tile summary and a full data table —
 and the map in the replay view includes the two new wings.
+
+The visualizer was then restructured around a **Field Guide**: one
+chapter per concept above, each with a real definition, what was
+built, what was learned, and a button that jumps straight into the
+replayer at the matching recording. Replay and Evaluation are still
+there as their own tabs — the guide is the new default landing view,
+and the Evaluation tab now opens with an explicit "what these metrics
+mean and why" key instead of an unexplained chart.
