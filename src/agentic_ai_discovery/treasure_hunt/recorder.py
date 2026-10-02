@@ -66,10 +66,21 @@ class TranscriptRecorder:
             }
         )
 
+    def compact(self, trigger: str) -> None:
+        self.data["events"].append({"type": "compact", "trigger": trigger})
+
     def approval(self, tool: str, approved: bool, note: str) -> None:
         self.data["events"].append({"type": "approval", "tool": tool, "approved": approved, "note": note})
 
-    def result(self, outcome: str, text: str | None, total_cost_usd: float | None, total_turns: int) -> None:
+    def result(
+        self, outcome: str, text: str | None, total_cost_usd: float | None, total_turns: int, treasure_found: bool
+    ) -> None:
+        # outcome=="success" only means the SDK session ended without a
+        # guardrail error - it is NOT proof the agent won. treasure_found is
+        # read straight off the game state and is the real ground truth
+        # (confirmed necessary: a thrashing-autocompact session can end with
+        # outcome="success" and a CLI diagnostic as its closing text, having
+        # never reached the treasure).
         self.data["events"].append(
             {
                 "type": "result",
@@ -77,6 +88,7 @@ class TranscriptRecorder:
                 "text": text,
                 "total_cost_usd": total_cost_usd,
                 "total_turns": total_turns,
+                "treasure_found": treasure_found,
             }
         )
 

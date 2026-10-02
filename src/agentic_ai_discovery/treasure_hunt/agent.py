@@ -40,9 +40,11 @@ async def run_treasure_hunt(interactive: bool = True) -> dict:
     interactive=False, e.g. unattended evaluation runs). If TRANSCRIPT_FILE
     is set, the whole run is also saved as a replayable JSON transcript.
 
-    Returns a summary dict: outcome, total_turns, total_cost_usd, and the
-    cumulative token/cache figures - for the evaluation harness to collect
-    across many runs without needing to re-read a saved transcript file."""
+    Returns a summary dict: outcome, total_turns, total_cost_usd, the
+    cumulative token/cache figures, and how many times the SDK's own
+    auto-compaction fired (PreCompact hook) - for the evaluation harness to
+    collect across many runs without needing to re-read a saved transcript
+    file."""
     max_turns = int(os.environ.get("MAX_TURNS", DEFAULT_MAX_TURNS))
     max_budget_usd = float(os.environ.get("MAX_BUDGET_USD", DEFAULT_MAX_BUDGET_USD))
 
@@ -52,10 +54,27 @@ async def run_treasure_hunt(interactive: bool = True) -> dict:
     recorder = TranscriptRecorder(start_room="entrance", max_turns=max_turns, max_budget_usd=max_budget_usd, model=MODEL)
     outcome = "unknown"
     final_cost: float | None = None
+    compactions = 0
+
+    # Unset (default) leaves the SDK's own auto-compact threshold in place —
+    # on a short hunt like this, context usage may never cross it. Set a low
+    # token count (minimum 100_000, per the CLI) to force compaction to
+    # actually happen within a normal run, so its effect can be observed and
+    # measured instead of assumed.
+    autocompact = os.environ.get("AUTOCOMPACT")
+    extra_args = {"autocompact": autocompact} if autocompact else {}
 
     with dashboard:
         server, world = build_game_server(dashboard, recorder)
         dashboard.set_room(world.current_room, world.current_room_description, world.current_room_exits)
+
+        async def log_compaction(hook_input, tool_use_id, context):
+            nonlocal compactions
+            compactions += 1
+            trigger = hook_input.get("trigger", "unknown")
+            dashboard.log(f"📦 Context compacted ({trigger})")
+            recorder.compact(trigger)
+            return {}
 
         async def gate_force_door(hook_input, tool_use_id, context):
             if hook_input.get("tool_name") != FORCE_DOOR_TOOL:
@@ -82,10 +101,14 @@ async def run_treasure_hunt(interactive: bool = True) -> dict:
             mcp_servers={"treasure_hunt": server},
             allowed_tools=ALLOWED_TOOLS,  # force_door is deliberately excluded - gated via the hook below
             permission_mode="bypassPermissions",
-            hooks={"PreToolUse": [HookMatcher(hooks=[gate_force_door])]},
+            hooks={
+                "PreToolUse": [HookMatcher(hooks=[gate_force_door])],
+                "PreCompact": [HookMatcher(hooks=[log_compaction])],
+            },
             system_prompt=SYSTEM_PROMPT,
             max_turns=max_turns,
             max_budget_usd=max_budget_usd,
+            extra_args=extra_args,
         )
 
         # The SDK can split one API response into several AssistantMessage
@@ -114,12 +137,18 @@ async def run_treasure_hunt(interactive: bool = True) -> dict:
                 elif isinstance(message, ResultMessage):
                     outcome = message.subtype
                     final_cost = message.total_cost_usd
-                    if message.subtype == "success":
+                    if message.subtype == "success" and world.treasure_found:
                         dashboard.log(f"🏆 {message.result}")
-                        recorder.result("success", message.result, message.total_cost_usd, dashboard.turns)
+                    elif message.subtype == "success":
+                        # The SDK ended the session cleanly, but the treasure
+                        # was never actually found - e.g. a thrashing-autocompact
+                        # abort. Don't show a trophy for that.
+                        dashboard.log(f"⚠️ Session ended without finding the treasure: {message.result}")
                     else:
                         dashboard.log(f"⏱️ Stopped: {message.subtype}")
-                        recorder.result(message.subtype, message.result, message.total_cost_usd, dashboard.turns)
+                    recorder.result(
+                        message.subtype, message.result, message.total_cost_usd, dashboard.turns, world.treasure_found
+                    )
         except ResultError as e:
             spent = e.data.get("total_cost_usd")
             spent_str = f"${spent:.4f}" if isinstance(spent, (int, float)) else "unknown"
@@ -134,7 +163,7 @@ async def run_treasure_hunt(interactive: bool = True) -> dict:
                 )
             else:
                 dashboard.log(f"🛑 Stopped early: {e.subtype} ({e.terminal_reason})")
-            recorder.result(e.subtype or "error", e.result, spent, dashboard.turns)
+            recorder.result(e.subtype or "error", e.result, spent, dashboard.turns, world.treasure_found)
 
     transcript_file = os.environ.get("TRANSCRIPT_FILE")
     if transcript_file:
@@ -148,6 +177,14 @@ async def run_treasure_hunt(interactive: bool = True) -> dict:
         "output_tokens": dashboard.tokens["output"],
         "cache_read_input_tokens": dashboard.tokens["cache_read"],
         "cache_creation_input_tokens": dashboard.tokens["cache_creation"],
+        "compactions": compactions,
+        # The SDK's "success" outcome only means the session ended without
+        # tripping a guardrail - it says nothing about whether the agent
+        # actually won. Confirmed the hard way: a thrashing-autocompact run
+        # can abort with outcome="success" and a CLI diagnostic as its
+        # closing text, having never reached the treasure. This is the one
+        # honest ground-truth signal - read directly off the game state.
+        "treasure_found": world.treasure_found,
     }
 
 
