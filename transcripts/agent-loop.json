@@ -17,16 +17,14 @@
     "garden": {
       "description": "A tangled garden, roses gone wild. Something glints beneath a bush.",
       "exits": {
-        "west": "courtyard",
-        "north": "tower"
+        "west": "courtyard"
       }
     },
     "tower": {
       "description": "A narrow stone tower. A ladder leads up into darkness.",
       "exits": {
         "south": "courtyard",
-        "up": "attic",
-        "west": "garden"
+        "up": "attic"
       }
     },
     "attic": {
@@ -37,21 +35,28 @@
     }
   },
   "start_room": "entrance",
-  "max_turns": 20,
-  "max_budget_usd": 0.5,
-  "model": "claude-sonnet-5",
+  "max_turns": 0,
+  "max_budget_usd": 0.0,
+  "model": "default",
   "events": [
     {
       "type": "rate_limit",
-      "five_hour": 0.73,
-      "seven_day": 0.7
+      "five_hour": 0.63,
+      "seven_day": 0.69
     },
     {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 8,
-      "cache_read_input_tokens": 1468,
-      "cache_creation_input_tokens": 0
+      "output_tokens": 24,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 17357
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 17357,
+      "cache_creation_input_tokens": 3691
     },
     {
       "type": "tool_call",
@@ -67,15 +72,15 @@
     },
     {
       "type": "rate_limit",
-      "five_hour": 0.73,
-      "seven_day": 0.71
+      "five_hour": 0.64,
+      "seven_day": 0.69
     },
     {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 5,
-      "cache_read_input_tokens": 122943,
-      "cache_creation_input_tokens": 1954
+      "output_tokens": 32,
+      "cache_read_input_tokens": 21048,
+      "cache_creation_input_tokens": 105
     },
     {
       "type": "tool_call",
@@ -88,6 +93,13 @@
         "north"
       ],
       "inventory": []
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 32,
+      "cache_read_input_tokens": 21048,
+      "cache_creation_input_tokens": 105
     },
     {
       "type": "tool_call",
@@ -106,16 +118,11 @@
       "inventory": []
     },
     {
-      "type": "rate_limit",
-      "five_hour": 0.73,
-      "seven_day": 0.7
-    },
-    {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 32,
-      "cache_read_input_tokens": 124897,
-      "cache_creation_input_tokens": 323
+      "output_tokens": 27,
+      "cache_read_input_tokens": 21153,
+      "cache_creation_input_tokens": 241
     },
     {
       "type": "tool_call",
@@ -132,38 +139,17 @@
       "inventory": []
     },
     {
-      "type": "tool_call",
-      "tool": "search_room",
-      "args": {},
-      "result": "You found a torn map fragment. A faded note scrawled on it reads: 'X marks the spot \u2014 beneath the dry fountain.' You add the fragment to your inventory.",
-      "is_error": false,
-      "room": "courtyard",
-      "exits": [
-        "south",
-        "north",
-        "east"
-      ],
-      "inventory": [
-        "a torn map fragment"
-      ]
-    },
-    {
-      "type": "rate_limit",
-      "five_hour": 0.73,
-      "seven_day": 0.71
-    },
-    {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 8,
-      "cache_read_input_tokens": 125220,
-      "cache_creation_input_tokens": 330
+      "output_tokens": 27,
+      "cache_read_input_tokens": 21153,
+      "cache_creation_input_tokens": 241
     },
     {
       "type": "tool_call",
       "tool": "search_room",
       "args": {},
-      "result": "You've already collected everything here.",
+      "result": "You found a torn map fragment and added it to your inventory.",
       "is_error": false,
       "room": "courtyard",
       "exits": [
@@ -178,34 +164,9 @@
     {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 3,
-      "cache_read_input_tokens": 125550,
-      "cache_creation_input_tokens": 192
-    },
-    {
-      "type": "tool_call",
-      "tool": "move",
-      "args": {
-        "direction": "down"
-      },
-      "result": "There is no exit to the down from here.",
-      "is_error": false,
-      "room": "courtyard",
-      "exits": [
-        "south",
-        "north",
-        "east"
-      ],
-      "inventory": [
-        "a torn map fragment"
-      ]
-    },
-    {
-      "type": "usage",
-      "input_tokens": 2,
-      "output_tokens": 3,
-      "cache_read_input_tokens": 125742,
-      "cache_creation_input_tokens": 192
+      "output_tokens": 32,
+      "cache_read_input_tokens": 21394,
+      "cache_creation_input_tokens": 233
     },
     {
       "type": "tool_call",
@@ -218,40 +179,29 @@
       "room": "tower",
       "exits": [
         "south",
-        "up",
-        "west"
+        "up"
       ],
       "inventory": [
         "a torn map fragment"
       ]
-    },
-    {
-      "type": "rate_limit",
-      "five_hour": 0.74,
-      "seven_day": 0.71
     },
     {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 32,
-      "cache_read_input_tokens": 125934,
-      "cache_creation_input_tokens": 220
+      "output_tokens": 75,
+      "cache_read_input_tokens": 21627,
+      "cache_creation_input_tokens": 147
     },
     {
-      "type": "tool_call",
-      "tool": "look_around",
-      "args": {},
-      "result": "A narrow stone tower. A ladder leads up into darkness. Exits: south, up, west.",
-      "is_error": false,
-      "room": "tower",
-      "exits": [
-        "south",
-        "up",
-        "west"
-      ],
-      "inventory": [
-        "a torn map fragment"
-      ]
+      "type": "text",
+      "text": "Exploring the estate: I found a map fragment in the courtyard and I'm now in a tower with a ladder going up. I'll search here first."
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 75,
+      "cache_read_input_tokens": 21627,
+      "cache_creation_input_tokens": 147
     },
     {
       "type": "tool_call",
@@ -262,8 +212,7 @@
       "room": "tower",
       "exits": [
         "south",
-        "up",
-        "west"
+        "up"
       ],
       "inventory": [
         "a torn map fragment"
@@ -272,23 +221,20 @@
     {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 32,
-      "cache_read_input_tokens": 126154,
-      "cache_creation_input_tokens": 283
+      "output_tokens": 75,
+      "cache_read_input_tokens": 21627,
+      "cache_creation_input_tokens": 147
     },
     {
       "type": "tool_call",
-      "tool": "move",
-      "args": {
-        "direction": "up"
-      },
-      "result": "A loose rung gives way and you slip back down, unhurt. The ladder still looks climbable overall \u2014 it was probably just that one step. Worth trying again.",
-      "is_error": true,
+      "tool": "look_around",
+      "args": {},
+      "result": "A narrow stone tower. A ladder leads up into darkness. Exits: south, up.",
+      "is_error": false,
       "room": "tower",
       "exits": [
         "south",
-        "up",
-        "west"
+        "up"
       ],
       "inventory": [
         "a torn map fragment"
@@ -298,8 +244,8 @@
       "type": "usage",
       "input_tokens": 2,
       "output_tokens": 32,
-      "cache_read_input_tokens": 126437,
-      "cache_creation_input_tokens": 205
+      "cache_read_input_tokens": 21774,
+      "cache_creation_input_tokens": 267
     },
     {
       "type": "tool_call",
@@ -321,22 +267,8 @@
       "type": "usage",
       "input_tokens": 2,
       "output_tokens": 32,
-      "cache_read_input_tokens": 126642,
-      "cache_creation_input_tokens": 180
-    },
-    {
-      "type": "tool_call",
-      "tool": "look_around",
-      "args": {},
-      "result": "A dusty attic, moonlight slipping through a cracked roof. Exits: down. You notice something here.",
-      "is_error": false,
-      "room": "attic",
-      "exits": [
-        "down"
-      ],
-      "inventory": [
-        "a torn map fragment"
-      ]
+      "cache_read_input_tokens": 22041,
+      "cache_creation_input_tokens": 118
     },
     {
       "type": "tool_call",
@@ -356,20 +288,42 @@
     {
       "type": "usage",
       "input_tokens": 2,
-      "output_tokens": 9,
-      "cache_read_input_tokens": 126822,
-      "cache_creation_input_tokens": 294
+      "output_tokens": 32,
+      "cache_read_input_tokens": 22041,
+      "cache_creation_input_tokens": 118
+    },
+    {
+      "type": "tool_call",
+      "tool": "look_around",
+      "args": {},
+      "result": "A dusty attic, moonlight slipping through a cracked roof. Exits: down.",
+      "is_error": false,
+      "room": "attic",
+      "exits": [
+        "down"
+      ],
+      "inventory": [
+        "a torn map fragment",
+        "the treasure chest"
+      ]
+    },
+    {
+      "type": "usage",
+      "input_tokens": 2,
+      "output_tokens": 105,
+      "cache_read_input_tokens": 22159,
+      "cache_creation_input_tokens": 228
     },
     {
       "type": "text",
-      "text": "Found it! \ud83c\udfc6\n\nThe path: **Gate \u2192 Courtyard \u2192 Tower \u2192 (climbed the tricky ladder) \u2192 Attic**, where a dusty chest held **THE TREASURE**. Victory!"
+      "text": "I found the treasure and won. It was in a dusty chest in the attic.\n\nI got there by going north from the entrance gate to the courtyard, where I picked up a torn map fragment. From there I went north to the tower and up the ladder to the attic, where searching the room opened the chest.\n\nI never explored the courtyard's east exit."
     },
     {
       "type": "result",
       "outcome": "success",
-      "text": "Found it! \ud83c\udfc6\n\nThe path: **Gate \u2192 Courtyard \u2192 Tower \u2192 (climbed the tricky ladder) \u2192 Attic**, where a dusty chest held **THE TREASURE**. Victory!",
-      "total_cost_usd": 0.2778018,
-      "total_turns": 11
+      "text": "I found the treasure and won. It was in a dusty chest in the attic.\n\nI got there by going north from the entrance gate to the courtyard, where I picked up a torn map fragment. From there I went north to the tower and up the ladder to the attic, where searching the room opened the chest.\n\nI never explored the courtyard's east exit.",
+      "total_cost_usd": 0.13160360000000004,
+      "total_turns": 14
     }
   ]
 }

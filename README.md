@@ -174,3 +174,10 @@ replayer at the matching recording. Replay and Evaluation are still
 there as their own tabs — the guide is the new default landing view,
 and the Evaluation tab now opens with an explicit "what these metrics
 mean and why" key instead of an unexplained chart.
+
+Each chapter's recording is now version-correct: regenerated from the actual
+historical commit for that stone (via an isolated `git worktree` per branch),
+so Chapter 1 shows the bare agent loop with no guardrails/ladder-fail/lock at
+all, Chapter 3 shows the ladder-fail without the tower lock existing yet, and
+so on — not whatever the fully-loaded current map happens to do. Full writeup
+in `NOTES.md`.

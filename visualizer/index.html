@@ -783,7 +783,7 @@
     <p class="chapter-learned"><strong>Why it matters:</strong> agents cost more and are less predictable
       than workflows — every turn resends the whole growing history, and the exact path varies run to
       run. A real system starts with the simplest option that works, not "agent" by default.</p>
-    <button class="watch-btn" data-recording="showcase.json">▶ Watch: a full hunt</button>
+    <button class="watch-btn" data-recording="agent-loop.json">▶ Watch: a full hunt</button>
   </article>
 
   <article class="chapter">
@@ -1014,13 +1014,14 @@
 <script>
 (() => {
   const RECORDINGS = [
-    { file: 'showcase.json', label: 'Showcase — a full hunt' },
-    { file: 'guardrails.json', label: 'Guardrails — turn cap trips' },
-    { file: 'tool-failure-recovery.json', label: 'Tool failure & recovery' },
-    { file: 'planning-dependencies.json', label: 'Planning & dependencies' },
-    { file: 'prompt-injection.json', label: 'Untrusted output & prompt injection' },
-    { file: 'approval-gates.json', label: 'Approval gates for risky actions' },
-    { file: 'scaled-map.json', label: 'Scaling — the larger estate' },
+    { file: 'agent-loop.json', label: 'Ch.01 — the bare agent loop' },
+    { file: 'guardrails.json', label: 'Ch.02 — guardrails, turn cap trips' },
+    { file: 'tool-failure-recovery.json', label: 'Ch.03 — tool failure & recovery' },
+    { file: 'planning-dependencies.json', label: 'Ch.04 — planning & dependencies' },
+    { file: 'prompt-injection.json', label: 'Ch.05 — untrusted output & injection' },
+    { file: 'approval-gates.json', label: 'Ch.06 — approval gates' },
+    { file: 'scaled-map.json', label: 'Ch.07 — scaling, the larger estate' },
+    { file: 'showcase.json', label: 'Bonus — every mechanic at once' },
   ];
 
   const ROOM_POS = {
@@ -1301,7 +1302,10 @@
         transcript = data;
         index = -1;
         scrubber.max = data.events.length;
-        headerMeta.innerHTML = `${data.model}<br>cap: ${data.max_turns} turns · $${data.max_budget_usd.toFixed(2)}`;
+        const capText = data.max_turns
+          ? `cap: ${data.max_turns} turns · $${data.max_budget_usd.toFixed(2)}`
+          : 'no guardrail cap yet';
+        headerMeta.innerHTML = `${data.model}<br>${capText}`;
         resetVisualState();
         updateTransportUI();
       })
