@@ -964,6 +964,37 @@
     <button class="watch-btn" data-recording="vault-puzzle.json">▶ Watch: a clean vault solve</button>
   </article>
 
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">10</span>
+      <h2>A real capability ladder, found by testing rather than assuming</h2>
+    </div>
+    <p><strong>Definition.</strong> Before spending more effort engineering a harder task, test a cheaper
+      worry directly: maybe the model itself is simply too capable for a toy puzzle like this to ever
+      stress. Ran the identical vault puzzle, unchanged, against three models: <code>claude-sonnet-5</code>,
+      <code>claude-sonnet-4-5-20250929</code> (one generation back — the original Sonnet 4 is retired as of
+      June 15, 2026, verified directly rather than assumed), and <code>claude-haiku-4-5-20251001</code>
+      (a smaller tier entirely).</p>
+    <p class="chapter-learned"><strong>What we found:</strong> all three solved it correctly every time —
+      zero wrong <code>open_chest</code> attempts anywhere. Sonnet 5 stayed efficient (31-33 turns);
+      Sonnet 4.5 needed more turns and cost for the identical result, coherently; Haiku 4.5 solved it too,
+      but through genuinely aimless navigation — four separate dead-end re-searches and a pointless trip
+      back to the entrance, something neither Sonnet model did once. The gap was never memory — it was
+      exploration efficiency, and for Haiku, the <em>kind</em> of mistake changed entirely, not just its
+      frequency.</p>
+    <p class="chapter-caveat"><strong>The label gap, again:</strong> one Sonnet 4.5 run landed right at the
+      edge of the then-current budget cap — <code>outcome: "error_max_budget_usd"</code>, but
+      <code>treasure_found: true</code>. The exact ground-truth-vs-label lesson from the compaction stone,
+      resurfacing unprompted in a completely different context. Watch the recording below to see it.</p>
+    <p class="chapter-learned"><strong>What to conclude:</strong> chose Sonnet 4.5 as the new default
+      specifically because it's a controlled, coherent difficulty increase — a real step down from Sonnet 5
+      to build the next stones on, rather than Haiku's more chaotic failures, which would confound "the
+      puzzle is hard" with "the model doesn't understand the task." Recalibrated guardrails from one clean
+      run (42 turns / $2.06), then watched the 5-trial mean land notably <em>below</em> that single sample
+      ($1.33) — the same "one run is an estimate, not a precise number" lesson, confirmed a second time.</p>
+    <button class="watch-btn" data-recording="model-comparison.json">▶ Watch: a win the raw log calls a failure</button>
+  </article>
+
   <div class="chapter-upcoming">
     <h3>Coming next in this course</h3>
     <ul>
@@ -1087,6 +1118,7 @@
     { file: 'scaled-map.json', label: 'Ch.07 — scaling, the larger estate' },
     { file: 'context-compaction.json', label: 'Ch.08 — context compaction, forced to thrash' },
     { file: 'vault-puzzle.json', label: 'Ch.09 — the vault puzzle, a negative result' },
+    { file: 'model-comparison.json', label: 'Ch.10 — a real capability ladder' },
     { file: 'showcase.json', label: 'Bonus — every mechanic at once' },
   ];
 

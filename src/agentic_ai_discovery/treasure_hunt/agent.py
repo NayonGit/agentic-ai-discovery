@@ -20,17 +20,22 @@ SYSTEM_PROMPT = """You are an explorer in a small text-based treasure hunt.
 Use the tools to look around, move between rooms, and search for hidden items.
 Explore methodically until you find the treasure, then report that you've won."""
 
-MODEL = os.environ.get("MODEL", "claude-sonnet-5")
+MODEL = os.environ.get("MODEL", "claude-sonnet-4-5-20250929")
 
-# Recalibrated for the vault puzzle: visiting all 9 rooms (now mandatory,
-# not optional) plus assembling and entering the combination measured at
-# 34 turns / $1.39 for one clean, correct run - these give comfortable
-# headroom above that, same margin style as the original 20/$0.50 caps did
-# for the smaller map. To see the guardrails actually trip, force them low:
+# Switched the default model from Sonnet 5 to Sonnet 4.5: on the identical
+# vault puzzle, both solve it correctly every time (no wrong code attempts
+# in any trial), but Sonnet 4.5 reliably needs more turns and cost to get
+# there - a real, measured efficiency gap without resorting to a much
+# smaller model (Haiku 4.5 solves it too, but via visibly aimless
+# backtracking - a confound we'd rather not introduce yet). See NOTES.md.
+#
+# Recalibrated from a clean, uncapped run (42 turns / $2.06) - comfortable
+# headroom above that, same margin style as every earlier calibration. To
+# see the guardrails actually trip, force them low:
 #   MAX_TURNS=3 uv run treasure-hunt
 #   MAX_BUDGET_USD=0.01 uv run treasure-hunt
-DEFAULT_MAX_TURNS = 45
-DEFAULT_MAX_BUDGET_USD = 1.75
+DEFAULT_MAX_TURNS = 55
+DEFAULT_MAX_BUDGET_USD = 2.75
 
 
 async def run_treasure_hunt(interactive: bool = True) -> dict:
