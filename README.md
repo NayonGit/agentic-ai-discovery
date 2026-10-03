@@ -240,3 +240,31 @@ neither Sonnet model did it once), not correctness. Full writeup, including
 the two levers spec'd for a future stone (forcing *real* compaction instead
 of the thrashing forced override, and a genuine decoy/contradiction) in
 `NOTES.md`.
+
+### Switching the default model
+
+Tested the identical vault puzzle against three models rather than assume
+a worry either way: `claude-sonnet-5`, `claude-sonnet-4-5-20250929` (one
+generation back — the original `claude-sonnet-4-20250514` is retired as of
+June 15, 2026 and no longer accessible), and `claude-haiku-4-5-20251001`.
+All three solved it correctly every time, zero wrong code attempts anywhere
+— the gap was entirely in exploration efficiency, not memory. Sonnet 4.5
+took more turns/cost than Sonnet 5 but stayed coherent; Haiku 4.5 solved it
+too, but via genuinely aimless navigation (four dead-end re-searches, a
+pointless trip back to the entrance) that neither Sonnet model showed.
+
+Switched the project's default to **`claude-sonnet-4-5-20250929`** —
+`MODEL` is now an env var override:
+
+```bash
+MODEL=claude-haiku-4-5-20251001 uv run treasure-hunt
+```
+
+Chose generation over size on purpose: a controlled, coherent difficulty
+increase to build the next stones on, rather than a smaller model's more
+chaotic failures, which would confound "the puzzle is hard" with "the model
+doesn't understand the task." Guardrails recalibrated to 55 turns/$2.75
+from a measured run; the 5-trial baseline then came back cheaper than that
+one calibration sample ($1.33 mean vs. $2.06) — the same "one run is an
+estimate, not a precise number" lesson as the vault puzzle's own
+calibration, confirmed a second time. Full writeup in `NOTES.md`.
