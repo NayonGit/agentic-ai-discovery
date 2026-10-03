@@ -268,3 +268,21 @@ from a measured run; the 5-trial baseline then came back cheaper than that
 one calibration sample ($1.33 mean vs. $2.06) — the same "one run is an
 estimate, not a precise number" lesson as the vault puzzle's own
 calibration, confirmed a second time. Full writeup in `NOTES.md`.
+
+### A genuine decoy clue
+
+The previously-empty cellar now holds "a stained ledger page" claiming a
+false first digit (9) that conflicts with the library scroll's real one
+(4) — pure content, zero tool changes, with a subtle built-in tie-breaker
+(the scroll reads as a clear record; the ledger flags its own
+unreliability, "the ink has run badly").
+
+**Result:** 5/5 trials succeeded, numbers nearly unchanged from the
+no-decoy baseline (41.4 turns / $1.34 vs. 41.0 / $1.33). The agent
+explicitly noticed the conflict in every inspected run — *"this scroll
+says the first number is 4, but the earlier ledger said 9... I'll need to
+try both"* — weighed the two sources using exactly the reliability cue in
+the text, and entered the correct code on the first attempt. A genuinely
+different negative result than the vault puzzle's own: there was something
+real to get wrong here, and the model reasoned its way to the right answer
+anyway. Full writeup in `NOTES.md`.

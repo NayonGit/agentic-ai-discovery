@@ -995,11 +995,36 @@
     <button class="watch-btn" data-recording="model-comparison.json">▶ Watch: a win the raw log calls a failure</button>
   </article>
 
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">11</span>
+      <h2>A genuine decoy — and the model verified correctly anyway</h2>
+    </div>
+    <p><strong>Definition.</strong> The vault puzzle's own negative result diagnosed why it didn't work:
+      nothing in it could make the agent actually <em>wrong</em>, only slower. The first fix: the
+      previously-empty cellar now holds "a stained ledger page" claiming a false first digit (9) that
+      conflicts with the library scroll's real one (4) — pure content, zero tool changes. A subtle,
+      discoverable tie-breaker is built in on purpose: the scroll reads as a clear record, the ledger
+      explicitly flags its own unreliability ("the ink has run badly").</p>
+    <p class="chapter-learned"><strong>What we found:</strong> 5/5 trials succeeded, numbers nearly
+      identical to the no-decoy baseline (41.4 turns / $1.34 vs. 41.0 / $1.33). The decoy didn't move a
+      single aggregate number.</p>
+    <p class="chapter-caveat"><strong>Why, checked rather than assumed:</strong> a full transcript shows the
+      agent explicitly noticing the conflict — <em>"this scroll says the first number is 4, but the earlier
+      ledger said 9 (though the ink was smudged). I'll need to try both"</em> — then weighing the two sources
+      using exactly the reliability cue built into the text, and entering the correct code on the very
+      first attempt. Zero wasted tries.</p>
+    <p class="chapter-learned"><strong>What to conclude:</strong> a genuinely different result from the
+      vault puzzle's own, not a repeat of it. There was something real to get wrong this time, and the
+      model reasoned its way to the right answer anyway — a working verification capability, not an
+      absent test. A well-designed contradiction alone isn't enough to trip up a model that notices the
+      conflict and reasons about source reliability.</p>
+    <button class="watch-btn" data-recording="vault-decoy.json">▶ Watch: the model catching the decoy</button>
+  </article>
+
   <div class="chapter-upcoming">
     <h3>Coming next in this course</h3>
     <ul>
-      <li><strong>A genuine decoy clue</strong> — something that can be actively wrong, not just slow to
-        find, testing verification instead of pure recall.</li>
       <li><strong>Forcing real compaction</strong> — dense enough in-world documents to cross the natural
         threshold, measuring whether a lossy summary corrupts an exact fact.</li>
       <li><strong>SDK-native subagents</strong> — once a single agent genuinely isn't enough.</li>
@@ -1119,6 +1144,7 @@
     { file: 'context-compaction.json', label: 'Ch.08 — context compaction, forced to thrash' },
     { file: 'vault-puzzle.json', label: 'Ch.09 — the vault puzzle, a negative result' },
     { file: 'model-comparison.json', label: 'Ch.10 — a real capability ladder' },
+    { file: 'vault-decoy.json', label: 'Ch.11 — a decoy, verified correctly anyway' },
     { file: 'showcase.json', label: 'Bonus — every mechanic at once' },
   ];
 

@@ -61,7 +61,11 @@ ROOMS = {
     "cellar": {
         "description": "A cool stone cellar, empty wine racks collapsed against one wall.",
         "exits": {"up": "courtyard", "down": "crypt"},
-        "item": None,
+        "item": "a stained ledger page",
+        "item_description": (
+            "Tucked under a collapsed wine rack, a stained ledger page reads: 'Vault, first "
+            "number: 9.' The ink has run badly - hard to tell if that's really a 9."
+        ),
     },
     "crypt": {
         "description": "A small crypt, the air thick with dust. A single stone coffin lies undisturbed.",

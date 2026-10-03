@@ -1,0 +1,93 @@
+{
+  "trials": 5,
+  "runs": [
+    {
+      "outcome": "success",
+      "total_turns": 42,
+      "total_cost_usd": 1.3539627,
+      "input_tokens": 335,
+      "output_tokens": 90,
+      "cache_read_input_tokens": 4062999,
+      "cache_creation_input_tokens": 10524,
+      "compactions": 0,
+      "treasure_found": true,
+      "model": "claude-sonnet-4-5-20250929",
+      "duration_s": 124.9
+    },
+    {
+      "outcome": "success",
+      "total_turns": 41,
+      "total_cost_usd": 1.3268047,
+      "input_tokens": 327,
+      "output_tokens": 95,
+      "cache_read_input_tokens": 3965289,
+      "cache_creation_input_tokens": 10628,
+      "compactions": 0,
+      "treasure_found": true,
+      "model": "claude-sonnet-4-5-20250929",
+      "duration_s": 122.2
+    },
+    {
+      "outcome": "success",
+      "total_turns": 39,
+      "total_cost_usd": 1.2544459,
+      "input_tokens": 311,
+      "output_tokens": 87,
+      "cache_read_input_tokens": 3752903,
+      "cache_creation_input_tokens": 9888,
+      "compactions": 0,
+      "treasure_found": true,
+      "model": "claude-sonnet-4-5-20250929",
+      "duration_s": 115.9
+    },
+    {
+      "outcome": "success",
+      "total_turns": 42,
+      "total_cost_usd": 1.356265,
+      "input_tokens": 335,
+      "output_tokens": 81,
+      "cache_read_input_tokens": 4065910,
+      "cache_creation_input_tokens": 10583,
+      "compactions": 0,
+      "treasure_found": true,
+      "model": "claude-sonnet-4-5-20250929",
+      "duration_s": 121.7
+    },
+    {
+      "outcome": "success",
+      "total_turns": 43,
+      "total_cost_usd": 1.4032731999999999,
+      "input_tokens": 343,
+      "output_tokens": 102,
+      "cache_read_input_tokens": 4178814,
+      "cache_creation_input_tokens": 11211,
+      "compactions": 0,
+      "treasure_found": true,
+      "model": "claude-sonnet-4-5-20250929",
+      "duration_s": 134.6
+    }
+  ],
+  "aggregate": {
+    "success_rate": 1.0,
+    "outcome_counts": {
+      "success": 5
+    },
+    "turns": {
+      "mean": 41.4,
+      "median": 42
+    },
+    "cost_usd": {
+      "mean": 1.3389503,
+      "median": 1.3539627
+    },
+    "cache_read_input_tokens": {
+      "mean": 4005183,
+      "median": 4062999
+    },
+    "compactions": {
+      "mean": 0,
+      "median": 0
+    },
+    "compaction_rate": 0.0
+  }
+}
