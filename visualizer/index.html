@@ -935,13 +935,43 @@
     <button class="watch-btn" data-recording="context-compaction.json">▶ Watch: autocompact thrashing, caught</button>
   </article>
 
+  <article class="chapter">
+    <div class="chapter-head">
+      <span class="chapter-num">09</span>
+      <h2>The vault puzzle — a negative result worth keeping</h2>
+    </div>
+    <p><strong>Definition.</strong> A task only gives sub-agents or external memory room to prove their
+      worth if a single agent can genuinely fail it. The attic's chest became a locked, three-digit dial —
+      the digits scattered across three previously-decorative rooms, each stating its own position so the
+      code doesn't depend on exploration order. A new <code>open_chest(code)</code> tool is the only way
+      to win; wrong codes are freely retryable, since the intended difficulty is remembering the digits,
+      not being punished for guessing.</p>
+    <p class="chapter-learned"><strong>What we found:</strong> 5/5 trials succeeded, genuinely (checked
+      against <code>treasure_found</code>), at roughly double the pre-vault cost and turns — with zero
+      wrong code attempts anywhere. More rooms and more digits made the task <em>slower</em>, never
+      <em>harder</em> in the way that matters.</p>
+    <p class="chapter-caveat"><strong>Why, audited rather than assumed:</strong> context here grows only
+      ~200–300 tokens/turn, so even a 30+ turn run stays far short of needing compaction — the agent always
+      held the literal, uncompacted transcript. Three digits in a transcript a frontier model can see in
+      full isn't a memory test, just a longer walk. Testing the model itself (Sonnet 5 vs. Sonnet 4.5 vs.
+      Haiku 4.5, same puzzle) showed the identical pattern: all three got the code right every time: the
+      gap was entirely in navigation efficiency (Haiku re-searched already-emptied rooms four times;
+      neither Sonnet model did it once), not correctness.</p>
+    <p class="chapter-learned"><strong>What to conclude:</strong> "harder" for this class of model has to
+      come from making recall genuinely <em>lossy</em> (real compaction, not a forced override) or
+      genuinely <em>ambiguous</em> (a decoy clue to get wrong) — not from adding more of the same. Spec'd
+      both as separate next branches instead of guessing further.</p>
+    <button class="watch-btn" data-recording="vault-puzzle.json">▶ Watch: a clean vault solve</button>
+  </article>
+
   <div class="chapter-upcoming">
     <h3>Coming next in this course</h3>
     <ul>
-      <li><strong>Context management &amp; compaction</strong> — the fix for the cache-growth problem
-        above, measured with this same harness.</li>
-      <li><strong>SDK-native subagents</strong> — once a single agent genuinely isn't enough, even with
-        compaction.</li>
+      <li><strong>A genuine decoy clue</strong> — something that can be actively wrong, not just slow to
+        find, testing verification instead of pure recall.</li>
+      <li><strong>Forcing real compaction</strong> — dense enough in-world documents to cross the natural
+        threshold, measuring whether a lossy summary corrupts an exact fact.</li>
+      <li><strong>SDK-native subagents</strong> — once a single agent genuinely isn't enough.</li>
       <li><strong>Randomized map generation</strong> — makes persistent memory across runs actually
         meaningful, instead of just memorizing one fixed layout.</li>
     </ul>
@@ -1056,6 +1086,7 @@
     { file: 'approval-gates.json', label: 'Ch.06 — approval gates' },
     { file: 'scaled-map.json', label: 'Ch.07 — scaling, the larger estate' },
     { file: 'context-compaction.json', label: 'Ch.08 — context compaction, forced to thrash' },
+    { file: 'vault-puzzle.json', label: 'Ch.09 — the vault puzzle, a negative result' },
     { file: 'showcase.json', label: 'Bonus — every mechanic at once' },
   ];
 

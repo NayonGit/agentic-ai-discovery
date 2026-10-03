@@ -1,0 +1,88 @@
+{
+  "trials": 5,
+  "runs": [
+    {
+      "outcome": "success",
+      "total_turns": 31,
+      "total_cost_usd": 0.8641574,
+      "input_tokens": 62,
+      "output_tokens": 534,
+      "cache_read_input_tokens": 3733817,
+      "cache_creation_input_tokens": 20984,
+      "compactions": 0,
+      "treasure_found": true,
+      "duration_s": 59.2
+    },
+    {
+      "outcome": "success",
+      "total_turns": 32,
+      "total_cost_usd": 0.8475174000000003,
+      "input_tokens": 64,
+      "output_tokens": 615,
+      "cache_read_input_tokens": 3868212,
+      "cache_creation_input_tokens": 10612,
+      "compactions": 0,
+      "treasure_found": true,
+      "duration_s": 49.5
+    },
+    {
+      "outcome": "success",
+      "total_turns": 32,
+      "total_cost_usd": 0.8576249999999999,
+      "input_tokens": 64,
+      "output_tokens": 734,
+      "cache_read_input_tokens": 3975475,
+      "cache_creation_input_tokens": 8687,
+      "compactions": 0,
+      "treasure_found": true,
+      "duration_s": 79.7
+    },
+    {
+      "outcome": "success",
+      "total_turns": 33,
+      "total_cost_usd": 0.8901276,
+      "input_tokens": 66,
+      "output_tokens": 627,
+      "cache_read_input_tokens": 4111623,
+      "cache_creation_input_tokens": 9123,
+      "compactions": 0,
+      "treasure_found": true,
+      "duration_s": 73.1
+    },
+    {
+      "outcome": "success",
+      "total_turns": 30,
+      "total_cost_usd": 0.9442334000000001,
+      "input_tokens": 60,
+      "output_tokens": 518,
+      "cache_read_input_tokens": 3602267,
+      "cache_creation_input_tokens": 48049,
+      "compactions": 0,
+      "treasure_found": true,
+      "duration_s": 59.2
+    }
+  ],
+  "aggregate": {
+    "success_rate": 1.0,
+    "outcome_counts": {
+      "success": 5
+    },
+    "turns": {
+      "mean": 31.6,
+      "median": 32
+    },
+    "cost_usd": {
+      "mean": 0.8807321600000001,
+      "median": 0.8641574
+    },
+    "cache_read_input_tokens": {
+      "mean": 3858278.8,
+      "median": 3868212
+    },
+    "compactions": {
+      "mean": 0,
+      "median": 0
+    },
+    "compaction_rate": 0.0
+  }
+}

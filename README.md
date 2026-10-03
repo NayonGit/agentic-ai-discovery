@@ -210,3 +210,33 @@ figure (here and in every earlier stone) now checks the real game state
 the recorder, and the visualizer, which had the identical flaw. Full
 writeup, including why this doesn't appear to have affected earlier stones'
 reported numbers, in `NOTES.md`.
+
+### The vault puzzle
+
+The attic's treasure chest is now a locked, three-digit dial — searching it
+no longer wins outright. The three digits live in rooms that used to be
+decorative dead ends (a scroll in the library, an envelope in the archive, a
+medallion in the crypt), each clue naming its own position so the correct
+code doesn't depend on exploration order. A new `open_chest(code)` tool is
+the only way to win; wrong codes are freely retryable, since the intended
+difficulty is remembering the digits, not being punished for guessing.
+Guardrails moved from 20 turns/$0.50 to 45 turns/$1.75, recalibrated from a
+measured real run rather than guessed.
+
+**Honest finding:** this didn't make the task meaningfully *hard* — only
+slower. 5/5 trials succeeded, genuinely (verified against the real game
+state), at roughly double the pre-vault cost and turns, with zero wrong
+code attempts anywhere. Measured why: context only grows ~200–300
+tokens/turn here, so even a 30+ turn run stays far short of needing
+compaction — the agent always held the literal, uncompacted transcript, and
+three digits in a transcript a frontier model can see in full isn't a
+memory test. More rooms and more digits don't touch the actual bottleneck;
+nothing here can make recall lossy or ambiguous, so the task can only get
+slower, never wrong. Testing the model itself as a cheaper lever (Sonnet 5
+vs. Sonnet 4.5 vs. Haiku 4.5, all on the identical puzzle) showed the same
+pattern: all three got the code right every time, with the gap entirely in
+navigation efficiency (Haiku re-searched already-emptied rooms four times;
+neither Sonnet model did it once), not correctness. Full writeup, including
+the two levers spec'd for a future stone (forcing *real* compaction instead
+of the thrashing forced override, and a genuine decoy/contradiction) in
+`NOTES.md`.
