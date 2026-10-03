@@ -13,6 +13,7 @@ ALLOWED_TOOLS = [
     f"mcp__{SERVER_NAME}__look_around",
     f"mcp__{SERVER_NAME}__move",
     f"mcp__{SERVER_NAME}__search_room",
+    f"mcp__{SERVER_NAME}__open_chest",
 ]
 
 # Deliberately NOT in ALLOWED_TOOLS: callable, but every invocation goes
@@ -61,6 +62,19 @@ def build_game_server(dashboard: Dashboard, recorder: TranscriptRecorder) -> tup
         return {"content": [{"type": "text", "text": result}]}
 
     @tool(
+        "open_chest",
+        "Attempt to open a locked chest using a three-digit combination (e.g. '4-8-1').",
+        {"code": str},
+    )
+    async def open_chest(args: dict[str, Any]) -> dict[str, Any]:
+        result, is_error = world.open_chest(args["code"])
+        marker = "❌" if is_error else "🔧"
+        dashboard.log(f"{marker} open_chest({args['code']}) → {result}")
+        recorder.tool_call("open_chest", args, result, is_error, world.current_room, world.current_room_exits, world.inventory)
+        await dashboard.wait_for_step()
+        return {"content": [{"type": "text", "text": result}], "is_error": is_error}
+
+    @tool(
         "force_door",
         "Attempt to force open a locked door without the key. Risky and irreversible - "
         "may damage the door - and requires human approval before it takes effect.",
@@ -78,6 +92,6 @@ def build_game_server(dashboard: Dashboard, recorder: TranscriptRecorder) -> tup
     server = create_sdk_mcp_server(
         name=SERVER_NAME,
         version="1.0.0",
-        tools=[look_around, move, search_room, force_door],
+        tools=[look_around, move, search_room, open_chest, force_door],
     )
     return server, world

@@ -1,3 +1,5 @@
+import re
+
 ROOMS = {
     "entrance": {
         "description": "A crumbling stone gate marks the entrance to the old estate. Ivy swallows the walls.",
@@ -33,17 +35,28 @@ ROOMS = {
     "attic": {
         "description": "A dusty attic, moonlight slipping through a cracked roof.",
         "exits": {"down": "tower"},
-        "item": "the treasure chest",
+        "item": "a locked chest",
+        "item_description": (
+            "You find a heavy iron chest, sealed by a three-digit dial. It won't budge without "
+            "the right combination."
+        ),
     },
     "library": {
         "description": "Shelves of swollen, water-damaged books line the walls. Dust hangs in the air.",
         "exits": {"east": "courtyard", "north": "archive"},
         "item": "a dusty scroll",
+        "item_description": (
+            "You unroll a dusty scroll. Most of the writing has crumbled away, but one line "
+            "survives: 'The vault's first number is 4.'"
+        ),
     },
     "archive": {
         "description": "A cramped records room, cabinets rusted shut. One drawer hangs open.",
         "exits": {"south": "library"},
         "item": "a sealed envelope",
+        "item_description": (
+            "Inside the sealed envelope, a brittle note reads: 'The second number: 8.'"
+        ),
     },
     "cellar": {
         "description": "A cool stone cellar, empty wine racks collapsed against one wall.",
@@ -54,8 +67,16 @@ ROOMS = {
         "description": "A small crypt, the air thick with dust. A single stone coffin lies undisturbed.",
         "exits": {"up": "cellar"},
         "item": "a tarnished medallion",
+        "item_description": (
+            "Engraved on the back of the tarnished medallion: 'Third and final - 1.'"
+        ),
     },
 }
+
+# The attic's chest dial, in order - deliberately independent of room-discovery
+# order (each clue states its own position) so the correct code doesn't depend
+# on which order the three wings happen to be explored in.
+VAULT_CODE = (4, 8, 1)
 
 
 class World:
@@ -135,7 +156,21 @@ class World:
         if item in self.inventory:
             return "You've already collected everything here."
         self.inventory.append(item)
-        if item == "the treasure chest":
-            self.treasure_found = True
-            return "You pry open a dusty chest and find THE TREASURE! You win!"
         return room.get("item_description") or f"You found {item} and added it to your inventory."
+
+    def open_chest(self, code: str) -> tuple[str, bool]:
+        """Returns (message, is_error). Wrong codes are freely retryable -
+        no attempt limit, no state change - the difficulty is remembering
+        the three digits, not being punished for guessing."""
+        if self.treasure_found:
+            return "The chest is already open - the treasure is already in your hands.", False
+        if self.current_room != "attic":
+            return "There's no chest here to open.", True
+        if "a locked chest" not in self.inventory:
+            return "You haven't found a chest here yet - try searching the room first.", True
+
+        digits = tuple(int(d) for d in re.findall(r"\d", code))
+        if digits == VAULT_CODE:
+            self.treasure_found = True
+            return "The dial clicks into place. The chest springs open - THE TREASURE! You win!", False
+        return "The dial clicks against each notch, but nothing gives. That combination doesn't fit.", True

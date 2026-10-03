@@ -20,14 +20,17 @@ SYSTEM_PROMPT = """You are an explorer in a small text-based treasure hunt.
 Use the tools to look around, move between rooms, and search for hidden items.
 Explore methodically until you find the treasure, then report that you've won."""
 
-MODEL = "claude-sonnet-5"
+MODEL = os.environ.get("MODEL", "claude-sonnet-5")
 
-# Generous enough that a normal hunt always finishes comfortably. To see the
-# guardrails actually trip, force them low, e.g.:
+# Recalibrated for the vault puzzle: visiting all 9 rooms (now mandatory,
+# not optional) plus assembling and entering the combination measured at
+# 34 turns / $1.39 for one clean, correct run - these give comfortable
+# headroom above that, same margin style as the original 20/$0.50 caps did
+# for the smaller map. To see the guardrails actually trip, force them low:
 #   MAX_TURNS=3 uv run treasure-hunt
 #   MAX_BUDGET_USD=0.01 uv run treasure-hunt
-DEFAULT_MAX_TURNS = 20
-DEFAULT_MAX_BUDGET_USD = 0.50
+DEFAULT_MAX_TURNS = 45
+DEFAULT_MAX_BUDGET_USD = 1.75
 
 
 async def run_treasure_hunt(interactive: bool = True) -> dict:
@@ -185,6 +188,7 @@ async def run_treasure_hunt(interactive: bool = True) -> dict:
         # closing text, having never reached the treasure. This is the one
         # honest ground-truth signal - read directly off the game state.
         "treasure_found": world.treasure_found,
+        "model": MODEL,
     }
 
 
